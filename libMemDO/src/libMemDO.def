@@ -1,0 +1,5 @@
+LIBRARY libMemDO
+
+EXPORTS
+  mdo_modify_memory     @1
+

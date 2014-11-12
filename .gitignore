@@ -26,3 +26,7 @@
 *.exe
 *.out
 *.app
+
+*.lnk
+*.sln
+/3rd_party/utils_win
