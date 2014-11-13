@@ -1,0 +1,5 @@
+LIBRARY libIPCO
+
+EXPORTS
+  HookWndProc     @1
+
