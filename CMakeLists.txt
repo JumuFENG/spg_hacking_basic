@@ -8,4 +8,7 @@ add_definitions(-DUNICODE -D_UNICODE)
 include_directories(${PROJECT_SOURCE_DIR}/3rd_party/utils_win)
 
 add_subdirectory(libMemDO)
+add_subdirectory(libIPCO)
+add_subdirectory(libAssist)
+add_subdirectory(cczAssist)
 add_subdirectory(pvztest)
