@@ -9,6 +9,7 @@ SOURCE_GROUP(${Proj_NAME} FILES ${SRC_FILES})
 
 set(CurrentDir ${CMAKE_CURRENT_SOURCE_DIR})
 include(JuceLibraryCode/JuceLibraryCode.cmake)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/JuceLibraryCode ${CMAKE_CURRENT_SOURCE_DIR}/JuceLibraryCode/modules)
 
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
 set(CMAKE_CXX_FLAGS_DEBUG "/D_DEBUG /MTd /Zi /Ob0 /Od /RTC1")
