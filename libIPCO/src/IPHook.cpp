@@ -1,6 +1,6 @@
 #include "helper/helper.h"
 #include "helper/simpleoutput.h"
-#include "../../cczAssist/CczAssit.h"
+#include "../../libAssist/src/CczAssit.h"
 
 /**************************************************************** 
   WH_CALLWNDPROC hook procedure 

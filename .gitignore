@@ -30,6 +30,8 @@
 *.lnk
 *.sln
 *.sdf
+*.suo
+*.opensdf
 *.vcxproj.user
 /3rd_party/utils_win
 /output
