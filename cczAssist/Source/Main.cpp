@@ -12,11 +12,11 @@
 
 
 //==============================================================================
-class cczAssitApplication  : public JUCEApplication
+class cczAssistApplication  : public JUCEApplication
 {
 public:
     //==============================================================================
-    cczAssitApplication() {}
+    cczAssistApplication() {}
 
     const String getApplicationName() override       { return ProjectInfo::projectName; }
     const String getApplicationVersion() override    { return ProjectInfo::versionString; }
@@ -51,4 +51,4 @@ public:
 
 //==============================================================================
 // This macro generates the main() routine that launches the app.
-START_JUCE_APPLICATION (cczAssitApplication)
+START_JUCE_APPLICATION (cczAssistApplication)
