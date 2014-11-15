@@ -29,4 +29,9 @@
 
 *.lnk
 *.sln
+*.sdf
+*.vcxproj.user
 /3rd_party/utils_win
+/output
+Debug
+Release
