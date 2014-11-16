@@ -2756,6 +2756,9 @@
     <ClInclude Include="..\..\Source\MainComponent.h">
       <Filter>cczAssist\Source</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Source\cczAssistConfig.h">
+      <Filter>cczAssist\Source</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\JuceLibraryCode\modules\juce_audio_basics\juce_module_info">

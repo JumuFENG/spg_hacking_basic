@@ -10,7 +10,9 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "MainComponent.h"
+#include "cczAssistConfig.h"
 
+juce_ImplementSingleton(cczAssistLanguageSetting);
 
 //==============================================================================
 class cczAssistApplication  : public JUCEApplication
@@ -27,14 +29,13 @@ public:
     void initialise (const String& commandLine) override
     {
         // This method is where you should put your application's initialisation code..
-
         mainWindow = new MainWindow (getApplicationName());
     }
 
     void shutdown() override
     {
         // Add your application's shutdown code here..
-
+        cczAssistLanguageSetting::getInstance()->deleteInstance();
         mainWindow = nullptr; // (deletes our window)
     }
 
@@ -66,6 +67,7 @@ public:
                                                     DocumentWindow::allButtons)
         {
             setUsingNativeTitleBar (true);
+            setLookAndFeel(&lkfl);
             setContentOwned (new MainContentComponent(), true);
 
             centreWithSize (getWidth(), getHeight());
@@ -88,6 +90,7 @@ public:
         */
 
     private:
+        LookAndFeel_V1 lkfl;
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainWindow)
     };
 
