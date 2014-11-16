@@ -7,9 +7,6 @@ bool CCZAssitWrapper::bStop = false;
 
 bool CCZAssitWrapper::startprocess(const tstring& ccz_path, PROCESS_INFORMATION& procInfo)
 {
-//     ShellExecute(NULL, _T("Open"), ccz_path.c_str(), NULL, NULL, 0);
-//     WinExec( util_win::to_string(ccz_path).c_str(), 0);
-    
     STARTUPINFO startInfo = {0};
     startInfo.cb = sizeof(STARTUPINFO);
     startInfo.dwFlags = STARTF_USESHOWWINDOW;
@@ -48,11 +45,9 @@ DWORD WINAPI CCZAssitWrapper::AutoClickProc(LPVOID lpParam)
     {
         if (WAIT_OBJECT_0 == WaitForSingleObject(pAssit->hAutoClickEvt, 20))
         {
-            //printf("now dont send click\n");
             continue;
         }
 
-        //printf("now send click when needed\n");
         bool bSendClick = true;
         if (pAssit->hcczMainWnd == ::GetForegroundWindow())
         {
@@ -73,14 +68,9 @@ DWORD WINAPI CCZAssitWrapper::AutoClickProc(LPVOID lpParam)
 
         if (bSendClick)
         {
-            //             ::SendMessage(hWnd, WM_LBUTTONDOWN, 0, MAKELPARAM(300, 300));
-            //             ::Sleep(20);
-            //             ::SendMessage(hWnd, WM_LBUTTONUP, 0, MAKELPARAM(300, 300));
-            //             printf("Send: %d\n", k++);
             ::PostMessage(pAssit->hcczMainWnd, WM_LBUTTONDOWN, 0, MAKELPARAM(300, 300));
             ::Sleep(20);
             ::PostMessage(pAssit->hcczMainWnd, WM_LBUTTONUP, 0, MAKELPARAM(300,300));
-            //::PostMessage(hWnd, BM_CLICK, 0, 0);
         }
     }
     return 0;
@@ -209,4 +199,25 @@ void CCZAssitWrapper::hookto_ccz(const tstring& dllFile, const tstring& procname
         hkprcKeyBd,
         hinstDLL,
         tid);
+}
+
+void CCZAssitWrapper::startccz(const string& path)
+{
+    startprocess(util_win::to_tstring(path), cczProcInfo);
+}
+
+void CCZAssitWrapper::autoclick()
+{
+    hookto_ccz(TEXT("libIPCO.dll"),TEXT("HookWndProc"), cczProcInfo.dwThreadId);
+    autosend_mouseclick(get_ccz_mainwnd(cczProcInfo.dwThreadId), 90);
+}
+
+CCZWrapperBase* GetAssistWrapperObject()
+{
+    return new CCZAssitWrapper();
+}
+
+void ReleaseAW(CCZWrapperBase* wbObj)
+{
+    delete wbObj;
 }

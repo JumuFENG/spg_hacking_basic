@@ -1,6 +1,12 @@
 #ifndef _CCZ_ASSITANT_H
 #define _CCZ_ASSITANT_H
 
+#if defined (libAssist_EXPORTS)
+#   define Ccc_Assist_API __declspec(dllexport)
+#else
+#   define Ccc_Assist_API __declspec(dllimport)
+#endif
+
 #include "helper/tstring.h"
 #include <vector>
 
@@ -21,7 +27,21 @@ protected:
     std::vector<HWND>  allfind;
 };
 
-class CCZAssitWrapper{
+class CCZWrapperBase {
+public:
+    CCZWrapperBase()
+    {
+    }
+    virtual ~CCZWrapperBase(){}
+    virtual void startccz(const string&) = 0;
+    virtual void autoclick() = 0;
+protected:
+    PROCESS_INFORMATION cczProcInfo;
+};
+
+class CCZAssitWrapper 
+    : public CCZWrapperBase
+{
 public:
     CCZAssitWrapper();
     ~CCZAssitWrapper();
@@ -57,6 +77,11 @@ public:
      */
     void hookto_ccz(const tstring& dllFile, const tstring& procname, DWORD tid);
 
+public:
+    // the following are exported
+    void startccz(const string&);
+    void autoclick();
+
 private:
     static bool bStop;
     tstring str_mainClassName;
@@ -68,5 +93,8 @@ private:
     bool    stillClickOnBg;
     int     invalidHeight;
 };
+
+extern "C" __declspec(dllexport) CCZWrapperBase* GetAssistWrapperObject();
+extern "C" __declspec(dllexport) void ReleaseAW(CCZWrapperBase*);
 
 #endif //_CCZ_ASSITANT_H

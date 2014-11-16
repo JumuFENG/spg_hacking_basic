@@ -21,10 +21,6 @@ LRESULT WINAPI HookWndProc(int nCode, WPARAM wParam, LPARAM lParam)
     HANDLE hAutoClickEvent = OpenEvent(EVENT_ALL_ACCESS, NULL, CCZ_AUTOCLICK_EVENT_NAME);
     static bool nowStop = false;
     static HWND hCczMain = FindWindow(CCZ_MAINWINDOWNAME, CCZ_MAINWINDOWNAME);
-    if (hCczMain != NULL)
-    {
-        SetWindowText(hCczMain, nowStop ? CCZ_MAINWINDOWNAME : CCZ_MAINWINDOWNAME_AUTOCLK);
-    }
 
     if (nCode == HC_ACTION && (((lParam >> 30) & 0x3) == 3))
     {
@@ -66,5 +62,9 @@ LRESULT WINAPI HookWndProc(int nCode, WPARAM wParam, LPARAM lParam)
         }
     }
     CloseHandle(hAutoClickEvent);
+    if (hCczMain != NULL)
+    {
+        SetWindowText(hCczMain, nowStop ? CCZ_MAINWINDOWNAME : CCZ_MAINWINDOWNAME_AUTOCLK);
+    }
     return CallNextHookEx(NULL, nCode, wParam, lParam); 
 } 

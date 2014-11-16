@@ -11,8 +11,10 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "MainComponent.h"
 #include "cczAssistConfig.h"
+#include "cczAssistLibLoader.h"
 
 juce_ImplementSingleton(cczAssistLanguageSetting);
+juce_ImplementSingleton(cczAssistLibLoader);
 
 //==============================================================================
 class cczAssistApplication  : public JUCEApplication
@@ -36,6 +38,7 @@ public:
     {
         // Add your application's shutdown code here..
         cczAssistLanguageSetting::getInstance()->deleteInstance();
+        cczAssistLibLoader::getInstance()->deleteInstance();
         mainWindow = nullptr; // (deletes our window)
     }
 

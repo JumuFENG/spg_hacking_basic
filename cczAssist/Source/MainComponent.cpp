@@ -8,6 +8,7 @@
 
 #include "MainComponent.h"
 #include "cczAssistConfig.h"
+#include "cczAssistLibLoader.h"
 
 //==============================================================================
 MainContentComponent::MainContentComponent()
@@ -76,6 +77,10 @@ void MainContentComponent::buttonClicked(Button* btnThatClicked)
             }
         }
         // Run the Program
-
+        if (File(toRun).exists())
+        {
+            cczAssistLibLoader::getInstance()->RunCczProgram(toRun);
+            cczAssistLibLoader::getInstance()->AutoClickCczMain();
+        }
     }
 }
