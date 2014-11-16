@@ -18,6 +18,7 @@
     your controls and content.
 */
 class MainContentComponent   : public Component
+    , public ButtonListener
 {
 public:
     //==============================================================================
@@ -26,6 +27,13 @@ public:
 
     void paint (Graphics&);
     void resized();
+
+    void buttonClicked(Button* btnThatClicked);
+
+public:
+    TextButton  btn_Exec;
+    Label       lbl_Path_ccz;
+    TextEditor  edt_Path_ccz;
 
 private:
     //==============================================================================

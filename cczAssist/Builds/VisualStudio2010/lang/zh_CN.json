@@ -1,5 +1,6 @@
 ﻿{
   "cczAssistMain_Label_Path": "路径:",
-  "cczAssistMain_btn_Browse": "浏览",
-  "cczAssistMain_btn_Run": "启动"
+  "cczAssistMain_btn_Browse": "浏览&启动",
+  "cczAssistMain_btn_Run": "启动",
+  "cczAssistMain_Filechooser_Tittle": "请选择文件路径"
 }
