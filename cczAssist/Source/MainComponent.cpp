@@ -73,7 +73,6 @@ void MainContentComponent::buttonClicked(Button* btnThatClicked)
                 edt_Path_ccz.setText(toRun);
                 btn_Exec.setButtonText(cczAssistLanguageSetting::getInstance()->
                     getUIText("cczAssistMain_btn_Run"));
-                btn_Exec.setEnabled(false);
             }
         }
         // Run the Program

@@ -5,6 +5,12 @@
 
 bool CCZAssitWrapper::bStop = false;
 
+bool CCZAssitWrapper::isprocessrunning(const tstring& ccz_path)
+{
+    tstring procname = ccz_path.substr(ccz_path.rfind(TEXT("\\")) + 1);
+    return helper::process::get_process_by_name(procname) != 0;
+}
+
 bool CCZAssitWrapper::startprocess(const tstring& ccz_path, PROCESS_INFORMATION& procInfo)
 {
     STARTUPINFO startInfo = {0};
@@ -203,7 +209,10 @@ void CCZAssitWrapper::hookto_ccz(const tstring& dllFile, const tstring& procname
 
 void CCZAssitWrapper::startccz(const string& path)
 {
-    startprocess(util_win::to_tstring(path), cczProcInfo);
+    if (!isprocessrunning(util_win::to_tstring(path)))
+    {
+        startprocess(util_win::to_tstring(path), cczProcInfo);
+    }
 }
 
 void CCZAssitWrapper::autoclick()

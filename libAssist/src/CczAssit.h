@@ -51,6 +51,7 @@ public:
      * @ret 成功与否
      */
     bool startprocess(const tstring& ccz_path, PROCESS_INFORMATION& procInfo);
+    bool isprocessrunning(const tstring& ccz_path);
 
     static DWORD WINAPI AutoClickProc(LPVOID lpParam);
     static BOOL CALLBACK EnumThreadWindowProc(HWND hwnd, LPARAM lParam);
