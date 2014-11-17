@@ -3,15 +3,15 @@
 #include "helper/simpleoutput.h"
 #include <WindowsX.h>
 
-bool CCZAssitWrapper::bStop = false;
+bool CCZAssitSdk::bStop = false;
 
-bool CCZAssitWrapper::isprocessrunning(const tstring& ccz_path)
+bool CCZAssitSdk::isprocessrunning(const tstring& ccz_path)
 {
     tstring procname = ccz_path.substr(ccz_path.rfind(TEXT("\\")) + 1);
     return helper::process::get_process_by_name(procname) != 0;
 }
 
-bool CCZAssitWrapper::startprocess(const tstring& ccz_path, PROCESS_INFORMATION& procInfo)
+bool CCZAssitSdk::startprocess(const tstring& ccz_path, PROCESS_INFORMATION& procInfo)
 {
     STARTUPINFO startInfo = {0};
     startInfo.cb = sizeof(STARTUPINFO);
@@ -43,9 +43,9 @@ bool CCZAssitWrapper::startprocess(const tstring& ccz_path, PROCESS_INFORMATION&
     return bRt;
 }
 
-DWORD WINAPI CCZAssitWrapper::AutoClickProc(LPVOID lpParam)
+DWORD WINAPI CCZAssitSdk::AutoClickProc(LPVOID lpParam)
 {
-    CCZAssitWrapper* pAssit = (CCZAssitWrapper*)lpParam;
+    CCZAssitSdk* pAssit = (CCZAssitSdk*)lpParam;
     LOG(pAssit->hcczMainWnd);
     while (!bStop)
     {
@@ -82,7 +82,7 @@ DWORD WINAPI CCZAssitWrapper::AutoClickProc(LPVOID lpParam)
     return 0;
 }
 
-CCZAssitWrapper::CCZAssitWrapper()
+CCZAssitSdk::CCZAssitSdk()
     : str_mainClassName(_T("三国志曹操传"))
     , str_mainWndName(_T("三国志曹操传"))
     , hhookKeybdMsg(NULL)
@@ -94,7 +94,7 @@ CCZAssitWrapper::CCZAssitWrapper()
 {
 }
 
-CCZAssitWrapper::~CCZAssitWrapper()
+CCZAssitSdk::~CCZAssitSdk()
 {
     bStop = true;
     if (hhookKeybdMsg)
@@ -116,7 +116,7 @@ CCZAssitWrapper::~CCZAssitWrapper()
 
 }
 
-BOOL CALLBACK  CCZAssitWrapper::EnumThreadWindowProc(HWND hwnd, LPARAM lParam)
+BOOL CALLBACK  CCZAssitSdk::EnumThreadWindowProc(HWND hwnd, LPARAM lParam)
 {
     EnumWndBase* ew = (EnumWndBase*)lParam;
     if (ew == NULL || hwnd == NULL)
@@ -149,7 +149,7 @@ public:
     }
 };
 
-HWND CCZAssitWrapper::get_ccz_mainwnd(const DWORD& tid)
+HWND CCZAssitSdk::get_ccz_mainwnd(const DWORD& tid)
 {
     if (hcczMainWnd == NULL)
     {
@@ -159,13 +159,13 @@ HWND CCZAssitWrapper::get_ccz_mainwnd(const DWORD& tid)
     return hcczMainWnd;
 }
 
-HWND CCZAssitWrapper::get_main_window(const DWORD& tid, EnumWndBase* ewb)
+HWND CCZAssitSdk::get_main_window(const DWORD& tid, EnumWndBase* ewb)
 {
     HWND hMainWnd = NULL;
     int k = 0;
     while (hMainWnd == NULL && k < 100)
     {
-        EnumThreadWindows(tid, CCZAssitWrapper::EnumThreadWindowProc, (LPARAM)ewb);
+        EnumThreadWindows(tid, CCZAssitSdk::EnumThreadWindowProc, (LPARAM)ewb);
         if (ewb->is_find_single())
         {
             hMainWnd = ewb->get_find_result();
@@ -181,7 +181,7 @@ HWND CCZAssitWrapper::get_main_window(const DWORD& tid, EnumWndBase* ewb)
     return hMainWnd;
 }
 
-void CCZAssitWrapper::autosend_mouseclick(HWND hWnd, int invalidH, bool clickOnBg)
+void CCZAssitSdk::autosend_mouseclick(HWND hWnd, int invalidH, bool clickOnBg)
 {
     hAutoClickEvt = CreateEvent(NULL, TRUE, FALSE, CCZ_AUTOCLICK_EVENT_NAME);
     if ( NULL == hAutoClickEvt)
@@ -194,7 +194,7 @@ void CCZAssitWrapper::autosend_mouseclick(HWND hWnd, int invalidH, bool clickOnB
     hAutoThread = CreateThread(NULL, 0, AutoClickProc, this, 0, &dwTh);
 }
 
-void CCZAssitWrapper::hookto_ccz(const tstring& dllFile, const tstring& procname, DWORD tid)
+void CCZAssitSdk::hookto_ccz(const tstring& dllFile, const tstring& procname, DWORD tid)
 {
     HINSTANCE hinstDLL = LoadLibrary(dllFile.c_str()); //"dlibIPCO.dll"
     HOOKPROC hkprcKeyBd = (HOOKPROC)GetProcAddress(hinstDLL, util_win::to_string(procname).c_str());//"HookWndProc" 
@@ -209,16 +209,32 @@ void CCZAssitWrapper::hookto_ccz(const tstring& dllFile, const tstring& procname
 
 void CCZAssitWrapper::startccz(const string& path)
 {
-    if (!isprocessrunning(util_win::to_tstring(path)))
+    if (!cczAssist.isprocessrunning(util_win::to_tstring(path)))
     {
-        startprocess(util_win::to_tstring(path), cczProcInfo);
+        cczAssist.startprocess(util_win::to_tstring(path), cczProcInfo);
     }
 }
 
 void CCZAssitWrapper::autoclick()
 {
-    hookto_ccz(TEXT("libIPCO.dll"),TEXT("HookWndProc"), cczProcInfo.dwThreadId);
-    autosend_mouseclick(get_ccz_mainwnd(cczProcInfo.dwThreadId), 90);
+    cczAssist.hookto_ccz(TEXT("libIPCO.dll"),TEXT("HookWndProc"), cczProcInfo.dwThreadId);
+    cczAssist.autosend_mouseclick(cczAssist.get_ccz_mainwnd(cczProcInfo.dwThreadId), 90);
+}
+
+void CCZAssitWrapper::writetoccz(unsigned long offset, byte* data, size_t len)
+{
+    if (hMemDO == NULL)
+    {
+        LOG("libMemDO doesn't loaded!");
+        return;
+    }
+    typedef int(*mdo_Mod_MemProc)(const tstring&, unsigned long, byte*, size_t);
+    mdo_Mod_MemProc mdo_mod_mem = (mdo_Mod_MemProc)GetProcAddress(hMemDO, "mdo_modify_memory");
+    if (mdo_mod_mem != NULL)
+    {
+        mdo_mod_mem(tstring(_T("Ekd5.exe")), offset, data, len);
+        LOG("Write memory done!");
+    }
 }
 
 CCZWrapperBase* GetAssistWrapperObject()

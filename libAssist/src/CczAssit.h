@@ -27,24 +27,11 @@ protected:
     std::vector<HWND>  allfind;
 };
 
-class CCZWrapperBase {
-public:
-    CCZWrapperBase()
-    {
-    }
-    virtual ~CCZWrapperBase(){}
-    virtual void startccz(const string&) = 0;
-    virtual void autoclick() = 0;
-protected:
-    PROCESS_INFORMATION cczProcInfo;
-};
-
-class CCZAssitWrapper 
-    : public CCZWrapperBase
+class CCZAssitSdk
 {
 public:
-    CCZAssitWrapper();
-    ~CCZAssitWrapper();
+    CCZAssitSdk();
+    ~CCZAssitSdk();
     /** 
      * @param ccz_path [in] 路径
      * @param procInfo [out] 进程info
@@ -78,10 +65,6 @@ public:
      */
     void hookto_ccz(const tstring& dllFile, const tstring& procname, DWORD tid);
 
-public:
-    // the following are exported
-    void startccz(const string&);
-    void autoclick();
 
 private:
     static bool bStop;
@@ -93,6 +76,46 @@ private:
     HANDLE  hAutoClickEvt;
     bool    stillClickOnBg;
     int     invalidHeight;
+};
+
+class CCZWrapperBase {
+public:
+    CCZWrapperBase()
+    {
+    }
+    virtual ~CCZWrapperBase(){}
+    virtual void startccz(const string&) = 0;
+    virtual void autoclick() = 0;
+    virtual void writetoccz(unsigned long, byte*, size_t) = 0;
+};
+
+class CCZAssitWrapper 
+    : public CCZWrapperBase
+{
+public:
+    CCZAssitWrapper()
+    {
+        hMemDO = LoadLibrary(TEXT("libMemDO.dll"));
+    }
+
+    ~CCZAssitWrapper()
+    {
+        if (hMemDO != NULL)
+        {
+            FreeLibrary(hMemDO);
+        }
+    }
+
+public:
+    // the following are exported
+    void startccz(const string&);
+    void autoclick();
+    void writetoccz(unsigned long offset, byte* data, size_t len);
+
+private:
+    CCZAssitSdk cczAssist;
+    PROCESS_INFORMATION cczProcInfo;
+    HMODULE     hMemDO;
 };
 
 extern "C" __declspec(dllexport) CCZWrapperBase* GetAssistWrapperObject();
