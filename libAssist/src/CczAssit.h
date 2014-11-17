@@ -94,8 +94,9 @@ class CCZAssitWrapper
 {
 public:
     CCZAssitWrapper()
+        : hMemDO(NULL)
     {
-        hMemDO = LoadLibrary(TEXT("libMemDO.dll"));
+        
     }
 
     ~CCZAssitWrapper()
@@ -105,6 +106,9 @@ public:
             FreeLibrary(hMemDO);
         }
     }
+private:
+    // this will delay the dll to load when needed, and load only one instance
+    bool check_hMemDO();
 
 public:
     // the following are exported

@@ -55,6 +55,14 @@ public:
         }
     }
 
+    void SetCczMemory(unsigned long offset, byte* data, size_t len)
+    {
+        if (caw != NULL)
+        {
+            caw->writetoccz(offset, data, len);
+        }
+    }
+
 private:
     HMODULE hAssist;
     CCZWrapperBase* caw;

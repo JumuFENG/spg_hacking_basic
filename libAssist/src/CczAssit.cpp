@@ -207,6 +207,15 @@ void CCZAssitSdk::hookto_ccz(const tstring& dllFile, const tstring& procname, DW
         tid);
 }
 
+bool CCZAssitWrapper::check_hMemDO()
+{
+    if (hMemDO == NULL)
+    {
+        hMemDO = LoadLibrary(TEXT("libMemDO.dll"));
+    }
+    return hMemDO != NULL;
+}
+
 void CCZAssitWrapper::startccz(const string& path)
 {
     if (!cczAssist.isprocessrunning(util_win::to_tstring(path)))
@@ -223,7 +232,7 @@ void CCZAssitWrapper::autoclick()
 
 void CCZAssitWrapper::writetoccz(unsigned long offset, byte* data, size_t len)
 {
-    if (hMemDO == NULL)
+    if (!check_hMemDO())
     {
         LOG("libMemDO doesn't loaded!");
         return;

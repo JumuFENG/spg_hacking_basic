@@ -21,12 +21,26 @@ MainContentComponent::MainContentComponent()
         "cczAssistMain_btn_Browse" :
         "cczAssistMain_btn_Run") ));
     btn_Exec.addListener(this);
+    btn_SetMem.setButtonText(cczAssistLanguageSetting::getInstance()->getUIText(
+        String("cczAssistMain_btn_SetMem")));
+    btn_SetMem.addListener(this);
+    lbl_Offset.setText(cczAssistLanguageSetting::getInstance()->getUIText(
+        String("cczAssistMain_Label_Offset")), dontSendNotification);
     lbl_Path_ccz.setSize(55, 25);
     edt_Path_ccz.setSize(220, 25);
     btn_Exec.setSize(90, 25);
+    btn_SetMem.setSize(70, 25);
+    edt_Offset.setSize(70, 25);
+    lbl_Offset.setSize(70, 25);
+    edt_NewBytes.setSize(200, 100);
+    edt_NewBytes.setMultiLine(true);
     addAndMakeVisible(lbl_Path_ccz);
     addAndMakeVisible(edt_Path_ccz);
     addAndMakeVisible(btn_Exec);
+    addAndMakeVisible(btn_SetMem);
+    addAndMakeVisible(edt_Offset);
+    addAndMakeVisible(lbl_Offset);
+    addAndMakeVisible(edt_NewBytes);
 }
 
 MainContentComponent::~MainContentComponent()
@@ -52,6 +66,15 @@ void MainContentComponent::resized()
     edt_Path_ccz.setTopLeftPosition(topx, topy);
     topx += 230;
     btn_Exec.setTopLeftPosition(topx, topy);
+
+    topx = 10; topy += 35;
+    edt_NewBytes.setTopLeftPosition(topx, topy);
+    topx += 220;
+    lbl_Offset.setTopLeftPosition(topx, topy);
+    topy += 30;
+    edt_Offset.setTopLeftPosition(topx, topy);
+    topy += 40;
+    btn_SetMem.setTopLeftPosition(topx, topy);
 }
 
 void MainContentComponent::buttonClicked(Button* btnThatClicked)
@@ -81,5 +104,9 @@ void MainContentComponent::buttonClicked(Button* btnThatClicked)
             cczAssistLibLoader::getInstance()->RunCczProgram(toRun);
             cczAssistLibLoader::getInstance()->AutoClickCczMain();
         }
+    }
+    else if (btnThatClicked == &btn_SetMem)
+    {
+
     }
 }
