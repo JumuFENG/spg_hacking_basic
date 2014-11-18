@@ -9,7 +9,7 @@ int main()
     {
         return 1;
     }
-    typedef int(*mdo_Mod_MemProc)(const tstring&, unsigned long, byte*, size_t);
+    typedef int(*mdo_Mod_MemProc)(const tstring&, unsigned long, const byte*, size_t);
     mdo_Mod_MemProc mdo_mod_mem = (mdo_Mod_MemProc)GetProcAddress(hMemDO, "mdo_modify_memory");
     if (mdo_mod_mem != NULL)
     {

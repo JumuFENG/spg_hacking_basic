@@ -230,14 +230,14 @@ void CCZAssitWrapper::autoclick()
     cczAssist.autosend_mouseclick(cczAssist.get_ccz_mainwnd(cczProcInfo.dwThreadId), 90);
 }
 
-void CCZAssitWrapper::writetoccz(unsigned long offset, byte* data, size_t len)
+void CCZAssitWrapper::writetoccz(unsigned long offset, const byte* data, size_t len)
 {
     if (!check_hMemDO())
     {
         LOG("libMemDO doesn't loaded!");
         return;
     }
-    typedef int(*mdo_Mod_MemProc)(const tstring&, unsigned long, byte*, size_t);
+    typedef int(*mdo_Mod_MemProc)(const tstring&, unsigned long, const byte*, size_t);
     mdo_Mod_MemProc mdo_mod_mem = (mdo_Mod_MemProc)GetProcAddress(hMemDO, "mdo_modify_memory");
     if (mdo_mod_mem != NULL)
     {

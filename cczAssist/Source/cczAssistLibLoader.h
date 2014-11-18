@@ -55,7 +55,7 @@ public:
         }
     }
 
-    void SetCczMemory(unsigned long offset, byte* data, size_t len)
+    void SetCczMemory(unsigned long offset, const byte* data, size_t len)
     {
         if (caw != NULL)
         {

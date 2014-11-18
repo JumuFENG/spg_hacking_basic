@@ -14,6 +14,6 @@
  * 替换前后相应位置的内容不会影响前后代码段的正常执行。Be Carefully!
  */
 int mdo_modify_memory(const tstring& strProcName, unsigned long offset,
-    byte* content, size_t nsize);
+    const byte* content, size_t nsize);
 
 #endif //MEM_DYNAMIC_OPERATE_HEADER_

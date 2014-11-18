@@ -86,7 +86,7 @@ public:
     virtual ~CCZWrapperBase(){}
     virtual void startccz(const string&) = 0;
     virtual void autoclick() = 0;
-    virtual void writetoccz(unsigned long, byte*, size_t) = 0;
+    virtual void writetoccz(unsigned long, const byte*, size_t) = 0;
 };
 
 class CCZAssitWrapper 
@@ -114,7 +114,7 @@ public:
     // the following are exported
     void startccz(const string&);
     void autoclick();
-    void writetoccz(unsigned long offset, byte* data, size_t len);
+    void writetoccz(unsigned long offset, const byte* data, size_t len);
 
 private:
     CCZAssitSdk cczAssist;

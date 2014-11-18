@@ -2,7 +2,7 @@
 #include "helper/helper.h"
 
 int mdo_modify_memory(const tstring& strProcName, unsigned long offset, 
-    byte* content, size_t nsize
+    const byte* content, size_t nsize
     )
 {
     DWORD dwPid = helper::process::get_process_by_name(strProcName);
