@@ -95,6 +95,7 @@ class CCZAssitWrapper
 public:
     CCZAssitWrapper()
         : hMemDO(NULL)
+        , bgetDbgPriv(false)
     {
         
     }
@@ -109,6 +110,7 @@ public:
 private:
     // this will delay the dll to load when needed, and load only one instance
     bool check_hMemDO();
+    bool enableDebugPrivilege();
 
 public:
     // the following are exported
@@ -120,6 +122,7 @@ private:
     CCZAssitSdk cczAssist;
     PROCESS_INFORMATION cczProcInfo;
     HMODULE     hMemDO;
+    bool        bgetDbgPriv;
 };
 
 extern "C" __declspec(dllexport) CCZWrapperBase* GetAssistWrapperObject();

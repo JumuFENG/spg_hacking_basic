@@ -94,15 +94,9 @@ unsigned long convetinputtoulong(const String& strOffset)
     bool offsetCovertOK = (backDecStr == strOffset);
     if (!offsetCovertOK)
     {
-        String backHexStr = String::toHexString(&offset, 1, 0).toUpperCase();
-        offsetCovertOK = (backHexStr == strOffset);
-        if (!offsetCovertOK)
-        {
-            if (strOffset.startsWith("0x") || strOffset.startsWith("0X"))
-            {
-                offsetCovertOK = (backHexStr == strOffset.substring(2).toUpperCase());
-            }
-        }
+        String oriStr = strOffset.toUpperCase();
+        offsetCovertOK = (String::toHexString((int64)offset).toUpperCase() == 
+            (oriStr.startsWith("0X") ? oriStr.substring(2) : oriStr));
     }
 
     if (!offsetCovertOK)

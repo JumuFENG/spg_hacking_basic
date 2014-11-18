@@ -216,6 +216,24 @@ bool CCZAssitWrapper::check_hMemDO()
     return hMemDO != NULL;
 }
 
+bool CCZAssitWrapper::enableDebugPrivilege()
+{
+    HANDLE hToken;
+    BOOL fOk = FALSE;
+    if(OpenProcessToken(GetCurrentProcess(), TOKEN_ADJUST_PRIVILEGES, &hToken))
+    {
+        TOKEN_PRIVILEGES tp;
+        tp.PrivilegeCount=1;
+        LookupPrivilegeValue(NULL, SE_DEBUG_NAME, &tp.Privileges[0].Luid);
+
+        tp.Privileges[0].Attributes = SE_PRIVILEGE_ENABLED;
+        AdjustTokenPrivileges(hToken, FALSE, &tp,sizeof(tp), NULL, NULL);
+        fOk = (GetLastError() == ERROR_SUCCESS);
+        CloseHandle(hToken);
+    }
+    return fOk == TRUE;
+}
+
 void CCZAssitWrapper::startccz(const string& path)
 {
     if (!cczAssist.isprocessrunning(util_win::to_tstring(path)))
@@ -236,6 +254,15 @@ void CCZAssitWrapper::writetoccz(unsigned long offset, const byte* data, size_t 
     {
         LOG("libMemDO doesn't loaded!");
         return;
+    }
+    if (!bgetDbgPriv)
+    {
+        if (!enableDebugPrivilege())
+        {
+            LOG("EnableDebugPrivilege Failed!");
+            LOG(GetLastError());
+            return;
+        }
     }
     typedef int(*mdo_Mod_MemProc)(const tstring&, unsigned long, const byte*, size_t);
     mdo_Mod_MemProc mdo_mod_mem = (mdo_Mod_MemProc)GetProcAddress(hMemDO, "mdo_modify_memory");

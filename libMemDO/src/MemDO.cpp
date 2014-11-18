@@ -1,10 +1,12 @@
 #include "MemDO.h"
 #include "helper/helper.h"
+#include "helper/simpleoutput.h"
 
 int mdo_modify_memory(const tstring& strProcName, unsigned long offset, 
     const byte* content, size_t nsize
     )
 {
+    LOG("begin to write Mem");
     DWORD dwPid = helper::process::get_process_by_name(strProcName);
     unsigned long procStart = helper::process::get_process_base_address(dwPid);
     unsigned long realAddress = procStart + offset;
@@ -13,6 +15,8 @@ int mdo_modify_memory(const tstring& strProcName, unsigned long offset,
         PROCESS_VM_WRITE, FALSE, dwPid);
     if (hTargetProc == NULL)
     {
+        LOG("OpenProcess failed!");
+        LOG(GetLastError());
         return 1;
     }
     SIZE_T szWritten;
@@ -20,8 +24,11 @@ int mdo_modify_memory(const tstring& strProcName, unsigned long offset,
         (LPVOID)realAddress, content, nsize, &szWritten))
     {
         CloseHandle(hTargetProc);
+        LOG("WriteProcessMemory failed!");
+        LOG(GetLastError());
         return GetLastError();
     }
+    LOG("WriteProcessMemory OK!");
     CloseHandle(hTargetProc);
     return 0;
 }
