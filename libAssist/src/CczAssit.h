@@ -49,6 +49,8 @@ public:
      */
     void autosend_mouseclick(HWND hWnd, int invalidHeight, bool stillClickOnBg = true);
 
+    void stop_autosend();
+
     /**
      * 获取线程主窗口句柄
      */
@@ -86,6 +88,7 @@ public:
     virtual ~CCZWrapperBase(){}
     virtual void startccz(const string&) = 0;
     virtual void autoclick() = 0;
+    virtual void stopautoclick() = 0;
     virtual void writetoccz(unsigned long, const byte*, size_t) = 0;
 };
 
@@ -116,6 +119,7 @@ public:
     // the following are exported
     void startccz(const string&);
     void autoclick();
+    void stopautoclick();
     void writetoccz(unsigned long offset, const byte* data, size_t len);
 
 private:

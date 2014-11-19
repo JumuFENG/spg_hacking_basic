@@ -35,6 +35,9 @@ public:
     Label       lbl_Path_ccz;
     TextEditor  edt_Path_ccz;
 
+    ToggleButton chkbx_AutoClk;
+    TextButton   btn_AutoClk;
+
     TextButton  btn_SetMem;
     Label       lbl_Offset;
     TextEditor  edt_Offset;

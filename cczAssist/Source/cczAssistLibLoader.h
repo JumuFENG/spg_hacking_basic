@@ -55,6 +55,14 @@ public:
         }
     }
 
+    void StopAutoClick()
+    {
+        if (caw != NULL)
+        {
+            caw->stopautoclick();
+        }
+    }
+
     void SetCczMemory(unsigned long offset, const byte* data, size_t len)
     {
         if (caw != NULL)

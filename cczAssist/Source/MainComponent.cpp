@@ -33,6 +33,20 @@ MainContentComponent::MainContentComponent()
     lbl_Path_ccz.setSize(55, 25);
     edt_Path_ccz.setSize(220, 25);
     btn_Exec.setSize(90, 25);
+
+    chkbx_AutoClk.setButtonText(cczAssistLanguageSetting::getInstance()->
+        getUIText(String("cczAssistMain_chkbx_Autoclk")));
+    chkbx_AutoClk.setToggleState(cczAssistAppConfig::getInstance()->
+        getConfigBool(String("Main_Setting_chkbx_Autoclk")), dontSendNotification);
+    chkbx_AutoClk.setSize(150, 22);
+    btn_AutoClk.setButtonText(cczAssistLanguageSetting::getInstance()->
+        getUIText(String(chkbx_AutoClk.getToggleState() 
+        ? "cczAssistMain_btn_Autoclk"
+        :"cczAssistMain_btn_noAutoclk")));
+    btn_AutoClk.setSize(80, 22);
+    btn_AutoClk.setToggleState(chkbx_AutoClk.getToggleState(),dontSendNotification);
+    btn_AutoClk.addListener(this);
+
     btn_SetMem.setSize(70, 25);
     edt_Offset.setSize(70, 25);
     lbl_Offset.setSize(70, 25);
@@ -41,6 +55,8 @@ MainContentComponent::MainContentComponent()
     addAndMakeVisible(lbl_Path_ccz);
     addAndMakeVisible(edt_Path_ccz);
     addAndMakeVisible(btn_Exec);
+    addAndMakeVisible(chkbx_AutoClk);
+    addAndMakeVisible(btn_AutoClk);
     addAndMakeVisible(btn_SetMem);
     addAndMakeVisible(edt_Offset);
     addAndMakeVisible(lbl_Offset);
@@ -71,7 +87,11 @@ void MainContentComponent::resized()
     topx += 230;
     btn_Exec.setTopLeftPosition(topx, topy);
 
-    topx = 10; topy += 35;
+    topx = 50; topy += 30;
+    chkbx_AutoClk.setTopLeftPosition(topx, topy);
+    topx += 160;
+    btn_AutoClk.setTopLeftPosition(topx, topy);
+    topx = 10; topy += 27;
     edt_NewBytes.setTopLeftPosition(topx, topy);
     topx += 220;
     lbl_Offset.setTopLeftPosition(topx, topy);
@@ -106,7 +126,10 @@ void MainContentComponent::buttonClicked(Button* btnThatClicked)
         if (File(toRun).exists())
         {
             cczAssistLibLoader::getInstance()->RunCczProgram(toRun);
-            cczAssistLibLoader::getInstance()->AutoClickCczMain();
+            if (chkbx_AutoClk.getToggleState() && btn_AutoClk.getToggleState())
+            {
+                cczAssistLibLoader::getInstance()->AutoClickCczMain();
+            }
         }
     }
     else if (btnThatClicked == &btn_SetMem)
@@ -115,9 +138,21 @@ void MainContentComponent::buttonClicked(Button* btnThatClicked)
         unsigned long offset = convetinputtoulong(strOffset);
         String strNewBytes = edt_NewBytes.getText().trim();
         std::vector<byte> newBytes = convertinputbytes(strNewBytes);
-        if (!newBytes.empty())
+        if (!newBytes.empty() && offset != 0)
         {
-            cczAssistLibLoader::getInstance()->SetCczMemory(offset, (byte*)&newBytes[0], newBytes.size());
+            cczAssistLibLoader::getInstance()->SetCczMemory(offset,
+                (byte*)&newBytes[0], newBytes.size());
+        }
+    }
+    else if (btnThatClicked == &btn_AutoClk)
+    {
+        btn_AutoClk.setToggleState(!btn_AutoClk.getToggleState(), dontSendNotification);
+        btn_AutoClk.setButtonText(cczAssistLanguageSetting::getInstance()->getUIText(
+            btn_AutoClk.getToggleState() ? "cczAssistMain_btn_Autoclk"
+            :"cczAssistMain_btn_noAutoclk"));
+        if (!btn_AutoClk.getToggleState())
+        {
+            cczAssistLibLoader::getInstance()->StopAutoClick();
         }
     }
 }

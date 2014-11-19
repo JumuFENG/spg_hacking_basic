@@ -183,15 +183,31 @@ HWND CCZAssitSdk::get_main_window(const DWORD& tid, EnumWndBase* ewb)
 
 void CCZAssitSdk::autosend_mouseclick(HWND hWnd, int invalidH, bool clickOnBg)
 {
-    hAutoClickEvt = CreateEvent(NULL, TRUE, FALSE, CCZ_AUTOCLICK_EVENT_NAME);
-    if ( NULL == hAutoClickEvt)
+    hAutoClickEvt = OpenEvent(EVENT_ALL_ACCESS, NULL, CCZ_AUTOCLICK_EVENT_NAME);
+    if (hAutoClickEvt == NULL && GetLastError() == ERROR_FILE_NOT_FOUND)
     {
-        return;
+        hAutoClickEvt = CreateEvent(NULL, TRUE, FALSE, CCZ_AUTOCLICK_EVENT_NAME);
+        if ( NULL == hAutoClickEvt)
+        {
+            return;
+        }
+        stillClickOnBg = clickOnBg;
+        invalidHeight = invalidH;
+        DWORD dwTh;
+        hAutoThread = CreateThread(NULL, 0, AutoClickProc, this, 0, &dwTh);
     }
-    stillClickOnBg = clickOnBg;
-    invalidHeight = invalidH;
-    DWORD dwTh;
-    hAutoThread = CreateThread(NULL, 0, AutoClickProc, this, 0, &dwTh);
+    else
+    {
+        ResetEvent(hAutoClickEvt);
+    }
+}
+
+void CCZAssitSdk::stop_autosend()
+{
+    if (hAutoClickEvt != NULL)
+    {
+        SetEvent(hAutoClickEvt);
+    }
 }
 
 void CCZAssitSdk::hookto_ccz(const tstring& dllFile, const tstring& procname, DWORD tid)
@@ -246,6 +262,11 @@ void CCZAssitWrapper::autoclick()
 {
     cczAssist.hookto_ccz(TEXT("libIPCO.dll"),TEXT("HookWndProc"), cczProcInfo.dwThreadId);
     cczAssist.autosend_mouseclick(cczAssist.get_ccz_mainwnd(cczProcInfo.dwThreadId), 90);
+}
+
+void CCZAssitWrapper::stopautoclick()
+{
+    cczAssist.stop_autosend();
 }
 
 void CCZAssitWrapper::writetoccz(unsigned long offset, const byte* data, size_t len)

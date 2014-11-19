@@ -65,7 +65,7 @@ namespace InputStringConverter {
             {
                 tmp += tstr[1];
             }
-            vecbyte.push_back(tmp.trimCharactersAtStart("0").getHexValue32());
+            vecbyte.push_back(tmp.getHexValue32());
             tstr = tstr.substring(2);
         }
 #undef VALID_HEX    // only use it in this function
