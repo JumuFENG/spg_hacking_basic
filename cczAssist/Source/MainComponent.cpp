@@ -38,6 +38,7 @@ MainContentComponent::MainContentComponent()
         getUIText(String("cczAssistMain_chkbx_Autoclk")));
     chkbx_AutoClk.setToggleState(cczAssistAppConfig::getInstance()->
         getConfigBool(String("Main_Setting_chkbx_Autoclk")), dontSendNotification);
+    chkbx_AutoClk.addListener(this);
     chkbx_AutoClk.setSize(150, 22);
     btn_AutoClk.setButtonText(cczAssistLanguageSetting::getInstance()->
         getUIText(String(chkbx_AutoClk.getToggleState() 
@@ -150,9 +151,11 @@ void MainContentComponent::buttonClicked(Button* btnThatClicked)
         btn_AutoClk.setButtonText(cczAssistLanguageSetting::getInstance()->getUIText(
             btn_AutoClk.getToggleState() ? "cczAssistMain_btn_Autoclk"
             :"cczAssistMain_btn_noAutoclk"));
-        if (!btn_AutoClk.getToggleState())
-        {
-            cczAssistLibLoader::getInstance()->StopAutoClick();
-        }
+        btn_AutoClk.getToggleState() ? 
+            cczAssistLibLoader::getInstance()->AutoClickCczMain()
+            : cczAssistLibLoader::getInstance()->StopAutoClick();
+    }
+    else if (btnThatClicked == &chkbx_AutoClk)
+    {
     }
 }
