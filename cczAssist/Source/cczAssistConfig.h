@@ -40,7 +40,15 @@ private:
 
 class cczAssistAppConfig{
 public:
-    cczAssistAppConfig(){}
+    cczAssistAppConfig()
+    {
+        fappcofig = File::getCurrentWorkingDirectory().getChildFile("settings/appconfig.json");
+        if (!fappcofig.exists())
+        {
+            fappcofig.create();
+        }
+        varAppConfig = JSON::parse(fappcofig);
+    }
     ~cczAssistAppConfig(){}
 
     juce_DeclareSingleton(cczAssistAppConfig, false);
@@ -61,6 +69,7 @@ public:
     }
 
 private:
+    File     fappcofig;
     var      varAppConfig;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(cczAssistAppConfig);
 };
