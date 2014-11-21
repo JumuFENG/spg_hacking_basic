@@ -48,11 +48,40 @@ public:
             fappcofig.create();
         }
         varAppConfig = JSON::parse(fappcofig);
+        if (NULL == varAppConfig.getDynamicObject())
+        {
+            varAppConfig = JSON::parse("{}");
+        }
     }
-    ~cczAssistAppConfig(){}
+
+    ~cczAssistAppConfig()
+    {
+        fappcofig.replaceWithText(JSON::toString(varAppConfig));
+    }
 
     juce_DeclareSingleton(cczAssistAppConfig, false);
+public:
+    bool getAutoSendClick()
+    {
+        return getConfigBool(String("AppSetting_AutoClick"));
+    }
 
+    void setAutoSendClick(bool bAuto)
+    {
+        varAppConfig.getDynamicObject()->setProperty("AppSetting_AutoClick", bAuto);
+    }
+
+    String getAppCczInstallPath()
+    {
+        return getConfigStr("AppSetting_CczInstallPath");
+    }
+
+    void setAppCczInstallPath(const String& path )
+    {
+        varAppConfig.getDynamicObject()->setProperty("AppSetting_CczInstallPath", path);
+    }
+
+private:
     String getConfigStr(const String& cfgId)
     {
         return varAppConfig[(Identifier)cfgId];

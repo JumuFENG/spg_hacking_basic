@@ -34,6 +34,8 @@
 *.opensdf
 *.vcxproj.user
 /3rd_party/utils_win
+/3rd_party/mhook
 /output
 Debug
 Release
+/cczAssist/Builds/VisualStudio2010/settings/appconfig.json

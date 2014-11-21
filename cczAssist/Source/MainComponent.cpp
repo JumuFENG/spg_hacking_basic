@@ -20,6 +20,8 @@ MainContentComponent::MainContentComponent()
     setSize (500, 400);
     lbl_Path_ccz.setText(cczAssistLanguageSetting::getInstance()->getUIText(
         String("cczAssistMain_Label_Path")), dontSendNotification);
+    edt_Path_ccz.setText(cczAssistAppConfig::getInstance()->getAppCczInstallPath());
+    edt_Path_ccz.addListener(this);
     btn_Exec.setButtonText(cczAssistLanguageSetting::getInstance()->getUIText(
         String(edt_Path_ccz.getText().isEmpty() ? 
         "cczAssistMain_btn_Browse" :
@@ -37,7 +39,7 @@ MainContentComponent::MainContentComponent()
     chkbx_AutoClk.setButtonText(cczAssistLanguageSetting::getInstance()->
         getUIText(String("cczAssistMain_chkbx_Autoclk")));
     chkbx_AutoClk.setToggleState(cczAssistAppConfig::getInstance()->
-        getConfigBool(String("Main_Setting_chkbx_Autoclk")), dontSendNotification);
+        getAutoSendClick(), dontSendNotification);
     chkbx_AutoClk.addListener(this);
     chkbx_AutoClk.setSize(150, 22);
     btn_AutoClk.setButtonText(cczAssistLanguageSetting::getInstance()->
@@ -127,6 +129,7 @@ void MainContentComponent::buttonClicked(Button* btnThatClicked)
         if (File(toRun).exists())
         {
             cczAssistLibLoader::getInstance()->RunCczProgram(toRun);
+            cczAssistAppConfig::getInstance()->setAppCczInstallPath(toRun);
             if (chkbx_AutoClk.getToggleState() && btn_AutoClk.getToggleState())
             {
                 cczAssistLibLoader::getInstance()->AutoClickCczMain();
@@ -157,5 +160,17 @@ void MainContentComponent::buttonClicked(Button* btnThatClicked)
     }
     else if (btnThatClicked == &chkbx_AutoClk)
     {
+        cczAssistAppConfig::getInstance()->setAutoSendClick(chkbx_AutoClk.getToggleState());
+    }
+}
+
+void MainContentComponent::textEditorTextChanged (TextEditor& edt)
+{
+    if (&edt == &edt_Path_ccz)
+    {
+        btn_Exec.setButtonText( cczAssistLanguageSetting::getInstance()->getUIText(
+            String( (edt_Path_ccz.isEmpty() || !File(edt_Path_ccz.getText()).exists() ||
+            File(edt_Path_ccz.getText()).isDirectory())
+            ? "cczAssistMain_btn_Browse" : "cczAssistMain_btn_Run")));
     }
 }

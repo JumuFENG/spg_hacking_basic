@@ -19,6 +19,7 @@
 */
 class MainContentComponent   : public Component
     , public ButtonListener
+    , public TextEditorListener
 {
 public:
     //==============================================================================
@@ -29,6 +30,7 @@ public:
     void resized();
 
     void buttonClicked(Button* btnThatClicked);
+    void textEditorTextChanged (TextEditor&);
 
 public:
     TextButton  btn_Exec;

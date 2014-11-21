@@ -1,2 +1,2 @@
-utils_win是本人整理的一些基础函数接口，也同步在git上：git@github.com:JumuFENG/utils_win.git 。在本项目中不做同步
-utils_win is a set of basic function interface on Windows, it can be cloned for git: git@github.com:JumuFENG/utils_win.git. I will ignore it in this project.
+utils_win是本人整理的一些基础函数接口，也同步在git上：git@github.com:JumuFENG/utils_win.git 。在本项目中不做同步。
+utils_win is a set of basic function interface on Windows, it can be cloned from git: git@github.com:JumuFENG/utils_win.git. I will ignore it in this project.
