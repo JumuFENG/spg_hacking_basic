@@ -1,6 +1,7 @@
 #include <tchar.h>
 #include <Windows.h>
 #include "helper/simpleoutput.h"
+#include "IPHook.h"
 
 BOOL WINAPI DllMain(
     HINSTANCE  hModule,
@@ -10,7 +11,11 @@ BOOL WINAPI DllMain(
 {
     if(dwReason == DLL_PROCESS_ATTACH)
     {
-        LOG("dll Loaded!");
+        DisableThreadLibraryCalls(hModule);
+//         LOG("dll Loaded!");
+        InstallMonitor();
+        //SpeedUp();
+        LOG("InstallMonitor done!");
         return TRUE;
     }
 }
