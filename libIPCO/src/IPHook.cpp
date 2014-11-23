@@ -10,8 +10,8 @@
 #define CCZ_MAINWINDOWNAME L"三国志曹操传"
 #define CCZ_MAINWINDOWNAME_AUTOCLK L"三国志曹操传 (Auto click)"
 
-
-LRESULT WINAPI HookWndProc(int nCode, WPARAM wParam, LPARAM lParam) 
+// Keyboad Message hook proc
+LRESULT WINAPI HookKeybdProc(int nCode, WPARAM wParam, LPARAM lParam) 
 { 
     if (nCode < 0 )  // do not process message 
     {
@@ -71,3 +71,45 @@ LRESULT WINAPI HookWndProc(int nCode, WPARAM wParam, LPARAM lParam)
     return CallNextHookEx(NULL, nCode, wParam, lParam); 
 } 
 
+// Window proc hook
+LRESULT WINAPI HookCallWndProc(int nCode, WPARAM wParam, LPARAM lParam)
+{
+    if (nCode < 0 )  // do not process message 
+    {
+        return CallNextHookEx(NULL, nCode, wParam, lParam); 
+    }
+    
+    if (nCode == HC_ACTION)
+    {
+        LPCWPSTRUCT cwps = (LPCWPSTRUCT)lParam;
+
+        switch (cwps->message)
+        {
+        case WM_COPYDATA:
+            {
+                PCOPYDATASTRUCT cpdata = (PCOPYDATASTRUCT)cwps->lParam;
+                switch (cpdata->dwData)
+                {
+                case SetHookTime:
+                    doAPIHook();
+                    LOG("Time Hook Done!");
+                    break;
+                case ChangeTimeSpeed:
+                    ChangeTimeSpeedFunc((unsigned long)cpdata->lpData);
+                    LOG("Change Time Speed Done!");
+                    break;
+                }
+            }
+            break;
+        }
+//         else if (cwps->message == WM_QUIT)
+//         {
+//             LOG("Get WM_Quit");
+//         }
+//         else
+//         {
+//             //LOG(cwps->message);
+//         }
+    }
+    return CallNextHookEx(NULL, nCode, wParam, lParam); 
+}

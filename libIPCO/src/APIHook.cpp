@@ -5,6 +5,8 @@
 ApiHookData  g_hookGetTickCount;
 ApiHookData  g_hookTmGetTime;
 ApiHookData  g_hookQueryPerforCounter;
+static float kSpeedRate = 1.0f;
+static bool  g_timeHooked = false;
 
 bool initApiHookData(ApiHookData* aData, const tstring& moduleName, const std::string& apiName)
 {
@@ -71,7 +73,7 @@ DWORD WINAPI HookProcGetTickCount()
     static DWORD lastTick = GetTickCount();
     static DWORD lastReal = lastTick;
     DWORD curTick = GetTickCount();
-    DWORD dw = lastTick + 10 * ((curTick - lastReal));
+    DWORD dw = lastTick + kSpeedRate * ((curTick - lastReal));
     lastReal = curTick;
     lastTick = dw;
     replaceApiEntry(&g_hookGetTickCount);
@@ -97,7 +99,7 @@ DWORD HookProctimeGetTime()
     static DWORD lastTime = otmget();
     static DWORD lastReal = lastTime;
     DWORD curTime = otmget();
-    DWORD dw = lastTime + 10 * ((curTime - lastReal));
+    DWORD dw = lastTime + kSpeedRate * ((curTime - lastReal));
     lastReal = curTime;
     lastTime = dw;
     replaceApiEntry(&g_hookTmGetTime);
@@ -123,7 +125,7 @@ BOOL WINAPI HookProcQueryPerformanceCounter(
     QueryPerformanceCounter(&curTime);
     static long long lastCouter = curTime.QuadPart;
     static long long lastReal = curTime.QuadPart;
-    long long curCounter = lastCouter + 10 * (curTime.QuadPart - lastReal);
+    long long curCounter = lastCouter + kSpeedRate * (curTime.QuadPart - lastReal);
     lpPerformanceCount->QuadPart = curCounter;
     lastReal = curTime.QuadPart;
     lastCouter = curCounter;
@@ -192,8 +194,24 @@ bool doAPIHook()
             LOG("timeGetTime Hook Failed!");
         }
     }
-
+    g_timeHooked = true;
     return rlt;
+}
+
+void undoAPIHook()
+{
+    if (g_timeHooked)
+    {
+        uninitApiHookData(&g_hookGetTickCount);
+        uninitApiHookData(&g_hookQueryPerforCounter);
+        uninitApiHookData(&g_hookTmGetTime);
+        g_timeHooked = false;
+    }
+}
+
+void ChangeTimeSpeedFunc(unsigned long newRate)
+{
+    kSpeedRate = newRate / 1000.0f;
 }
 
 // WINMM!timeGetTime

@@ -14,7 +14,7 @@
 namespace InputStringConverter {
     unsigned long convetinputtoulong(const String& strOffset)
     {
-        unsigned long offset = 0;
+        int64 offset = 0;
         if (strOffset.startsWith("0x") || strOffset.startsWith("0X")
             || strOffset.containsAnyOf("ABCDEFabcdef"))
         {
@@ -39,7 +39,7 @@ namespace InputStringConverter {
             Logger::writeToLog("Offset can't be converted!");
             return 0;
         }
-        return offset;
+        return (unsigned long)offset;
     }
 
     std::vector<byte> convertinputbytes(const String& strBytes)
@@ -65,7 +65,7 @@ namespace InputStringConverter {
             {
                 tmp += tstr[1];
             }
-            vecbyte.push_back(tmp.getHexValue32());
+            vecbyte.push_back((byte)tmp.getHexValue32());
             tstr = tstr.substring(2);
         }
 #undef VALID_HEX    // only use it in this function

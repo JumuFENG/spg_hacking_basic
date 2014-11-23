@@ -20,12 +20,17 @@ bool initApiHookData(ApiHookData* aData, const tstring& moduleName, const std::s
 bool uninitApiHookData(ApiHookData* aData);
 bool replaceApiEntry(ApiHookData* aData);
 bool recoverApiEntry(ApiHookData* aData);
+
 bool doAPIHook();
+void undoAPIHook();
 
 DWORD WINAPI HookProcGetTickCount();
 DWORD HookProctimeGetTime();
 BOOL WINAPI HookProcQueryPerformanceCounter(
     _Out_  LARGE_INTEGER *lpPerformanceCount
     );
+
+// 1000 is the base speed; i.e. the newRate will be divided by 1000
+void ChangeTimeSpeedFunc(unsigned long newRate);
 
 #endif // IPC_HOOK_APIHOOK_HEADER_H_

@@ -1,5 +1,5 @@
 LIBRARY libIPCO
 
 EXPORTS
-  HookWndProc     @1
-
+  HookKeybdProc     @1
+  HookCallWndProc   @2

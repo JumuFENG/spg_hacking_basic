@@ -11,11 +11,14 @@ BOOL WINAPI DllMain(
 {
     if(dwReason == DLL_PROCESS_ATTACH)
     {
-        DisableThreadLibraryCalls(hModule);
-//         LOG("dll Loaded!");
-        doAPIHook();
-        //SpeedUp();
-        LOG("APIHook done!");
+//        DisableThreadLibraryCalls(hModule);
+        LOG("dll Loaded!");
+        return TRUE;
+    }
+    else if (dwReason == DLL_PROCESS_DETACH)
+    {
+        undoAPIHook();
+        LOG("dll unloaded");
         return TRUE;
     }
 }

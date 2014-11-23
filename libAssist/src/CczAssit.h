@@ -65,14 +65,18 @@ public:
      * @param procname [in] dll中需进行注入的接口
      * @param tid [in] 要注入的窗口线程id
      */
-    void hookto_ccz(const tstring& dllFile, const tstring& procname, DWORD tid);
-
+    void hookkeybdto_ccz(const tstring& dllFile, const tstring& procname, DWORD tid);
+    void hookwndprocto_ccz(const tstring& dllFile, const tstring& procname, DWORD tid);
+    bool sendsettimehook();
+    void changetimespeed(unsigned long uprate);
 
 private:
     static bool bStop;
     tstring str_mainClassName;
     tstring str_mainWndName;
+    HINSTANCE hinstDLL;
     HHOOK   hhookKeybdMsg;
+    HHOOK   hhookWndProc;
     HWND    hcczMainWnd;
     HANDLE  hAutoThread;
     HANDLE  hAutoClickEvt;
@@ -88,6 +92,7 @@ public:
     virtual ~CCZWrapperBase(){}
     virtual void startccz(const string&) = 0;
     virtual void autoclick() = 0;
+    virtual void settimegear(float timeuprate) = 0;
     virtual void stopautoclick() = 0;
     virtual void writetoccz(unsigned long, const byte*, size_t) = 0;
 };
@@ -99,6 +104,7 @@ public:
     CCZAssitWrapper()
         : hMemDO(NULL)
         , bgetDbgPriv(false)
+        , bTimeHooked(false)
     {
         
     }
@@ -120,6 +126,7 @@ public:
     void startccz(const string&);
     void autoclick();
     void stopautoclick();
+    void settimegear(float timeuprate);
     void writetoccz(unsigned long offset, const byte* data, size_t len);
 
 private:
@@ -127,6 +134,7 @@ private:
     PROCESS_INFORMATION cczProcInfo;
     HMODULE     hMemDO;
     bool        bgetDbgPriv;
+    bool        bTimeHooked;
 };
 
 extern "C" __declspec(dllexport) CCZWrapperBase* GetAssistWrapperObject();

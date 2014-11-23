@@ -2,7 +2,7 @@
 #include "helper/helper.h"
 #include "helper/simpleoutput.h"
 #include <WindowsX.h>
-
+#include "../../libIPCO/src/IPHook.h"
 bool CCZAssitSdk::bStop = false;
 
 bool CCZAssitSdk::isprocessrunning(const tstring& ccz_path)
@@ -85,7 +85,9 @@ DWORD WINAPI CCZAssitSdk::AutoClickProc(LPVOID lpParam)
 CCZAssitSdk::CCZAssitSdk()
     : str_mainClassName(_T("三国志曹操传"))
     , str_mainWndName(_T("三国志曹操传"))
+    , hinstDLL(NULL)
     , hhookKeybdMsg(NULL)
+    , hhookWndProc(NULL)
     , hcczMainWnd(NULL)
     , hAutoThread(NULL)
     , hAutoClickEvt(NULL)
@@ -102,11 +104,22 @@ CCZAssitSdk::~CCZAssitSdk()
         UnhookWindowsHookEx(hhookKeybdMsg);
         hhookKeybdMsg = NULL;
     }
+    if (hhookWndProc)
+    {
+        UnhookWindowsHookEx(hhookWndProc);
+        hhookWndProc = NULL;
+    }
     if (hAutoThread != NULL)
     {
         WaitForSingleObject(hAutoThread, INFINITE);
         CloseHandle(hAutoThread);
         hAutoThread = NULL;
+    }
+
+    if (hinstDLL != NULL)
+    {
+        FreeLibrary(hinstDLL);
+        hinstDLL = NULL;
     }
     if (hAutoClickEvt != NULL)
     {
@@ -210,10 +223,14 @@ void CCZAssitSdk::stop_autosend()
     }
 }
 
-void CCZAssitSdk::hookto_ccz(const tstring& dllFile, const tstring& procname, DWORD tid)
+void CCZAssitSdk::hookkeybdto_ccz(const tstring& dllFile, const tstring& procname, DWORD tid)
 {
-    HINSTANCE hinstDLL = LoadLibrary(dllFile.c_str()); //"dlibIPCO.dll"
-    HOOKPROC hkprcKeyBd = (HOOKPROC)GetProcAddress(hinstDLL, util_win::to_string(procname).c_str());//"HookWndProc" 
+    if (NULL == hinstDLL)
+    {
+        hinstDLL = LoadLibrary(dllFile.c_str()); //"dlibIPCO.dll"
+    }
+    HOOKPROC hkprcKeyBd = (HOOKPROC)GetProcAddress(hinstDLL, 
+        util_win::to_string(procname).c_str());//"HookKeybdProc" 
 
     hhookKeybdMsg = SetWindowsHookEx( 
         WH_KEYBOARD,
@@ -221,6 +238,50 @@ void CCZAssitSdk::hookto_ccz(const tstring& dllFile, const tstring& procname, DW
         hkprcKeyBd,
         hinstDLL,
         tid);
+}
+
+void CCZAssitSdk::hookwndprocto_ccz(const tstring& dllFile, const tstring& procname, DWORD tid)
+{
+    if (NULL == hinstDLL)
+    {
+        hinstDLL = LoadLibrary(dllFile.c_str()); //"dlibIPCO.dll"
+    }
+    HOOKPROC hkprcWndProc = (HOOKPROC)GetProcAddress(hinstDLL, 
+        util_win::to_string(procname).c_str());
+
+    hhookWndProc = SetWindowsHookEx( 
+        WH_CALLWNDPROC,
+        hkprcWndProc,
+        hinstDLL,
+        tid);
+}
+
+bool CCZAssitSdk::sendsettimehook()
+{
+    if (hcczMainWnd == NULL)
+    {
+        LOG("MainWnd is NULL");
+        return false;
+    }
+    COPYDATASTRUCT cdstruc = {0};
+    cdstruc.dwData = SetHookTime;
+    SendMessage(hcczMainWnd, WM_COPYDATA, 0, (LPARAM)(LPVOID)(&cdstruc));
+    return true;
+}
+
+void CCZAssitSdk::changetimespeed(unsigned long uprate)
+{
+    if (hcczMainWnd == NULL)
+    {
+        LOG("MainWnd is NULL");
+        return;
+    }
+    COPYDATASTRUCT cdstruc = {0};
+    cdstruc.cbData = 0;
+    cdstruc.dwData = ChangeTimeSpeed;
+    cdstruc.lpData = (LPVOID)uprate;
+    SendMessage(hcczMainWnd, WM_COPYDATA, 0, (LPARAM)(LPVOID)(&cdstruc));
+    LOG("changetimespeed Done!");
 }
 
 bool CCZAssitWrapper::check_hMemDO()
@@ -260,8 +321,24 @@ void CCZAssitWrapper::startccz(const string& path)
 
 void CCZAssitWrapper::autoclick()
 {
-    cczAssist.hookto_ccz(TEXT("libIPCO.dll"),TEXT("HookWndProc"), cczProcInfo.dwThreadId);
+    cczAssist.hookkeybdto_ccz(TEXT("libIPCO.dll"),TEXT("HookKeybdProc"), cczProcInfo.dwThreadId);
     cczAssist.autosend_mouseclick(cczAssist.get_ccz_mainwnd(cczProcInfo.dwThreadId), 90);
+}
+
+void CCZAssitWrapper::settimegear(float timeuprate)
+{
+    if (!bTimeHooked)
+    {
+        cczAssist.hookwndprocto_ccz(TEXT("libIPCO.dll"), TEXT("HookCallWndProc"), cczProcInfo.dwThreadId);
+        bTimeHooked = cczAssist.sendsettimehook();
+        Sleep(1000);
+    }
+    if (!bTimeHooked)
+    {
+        LOG("Time hook not correct!");
+        return;
+    }
+    cczAssist.changetimespeed((unsigned long)(1000*timeuprate));
 }
 
 void CCZAssitWrapper::stopautoclick()
