@@ -59,11 +59,10 @@ MainContentComponent::MainContentComponent()
     timespeed_Slider.setSliderStyle(Slider::LinearVertical);
     timespeed_Slider.setRange(-20, 20, 1.0);
     float sldVal = cczAssistAppConfig::getInstance()->getTimeSpeedRate();
-    if (sldVal != 1.0f)
+    if (sldVal != 0.0f)
     {
         cczAssistLibLoader::getInstance()->SetTimeSpeed(sldVal);
     }
-    sldVal = sldVal < 1.0f ? 1.0f / (-sldVal) : sldVal - 1.0f;
     timespeed_Slider.setValue(sldVal, dontSendNotification);
     timespeed_Slider.setChangeNotificationOnlyOnRelease(true);
     timespeed_Slider.setTextBoxStyle(Slider::TextBoxAbove, false, 50, 20);
@@ -200,7 +199,6 @@ void MainContentComponent::sliderValueChanged (Slider* slider)
     if (slider == &timespeed_Slider)
     {
         float sldVal = timespeed_Slider.getValue();
-        sldVal = sldVal < 0 ? 1.0f / (-sldVal) : sldVal + 1.0f;
         cczAssistLibLoader::getInstance()->SetTimeSpeed(sldVal);
         cczAssistAppConfig::getInstance()->setTimeSpeedRate(sldVal);
     }

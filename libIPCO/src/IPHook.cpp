@@ -95,8 +95,9 @@ LRESULT WINAPI HookCallWndProc(int nCode, WPARAM wParam, LPARAM lParam)
                     LOG("Time Hook Done!");
                     break;
                 case ChangeTimeSpeed:
-                    ChangeTimeSpeedFunc((unsigned long)cpdata->lpData);
+                    ChangeTimeSpeedFunc(*(unsigned long*)cpdata->lpData);
                     LOG("Change Time Speed Done!");
+                    LOG((unsigned long)(*(unsigned long*)cpdata->lpData));
                     break;
                 }
             }

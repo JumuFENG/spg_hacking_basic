@@ -75,7 +75,8 @@ public:
     {
         if (caw != NULL)
         {
-            caw->settimegear(ar);
+            float r = ar < 0.0f ? 1.0f / (1.0f - ar) : 1.0f + ar;
+            caw->settimegear(r);
         }
     }
 

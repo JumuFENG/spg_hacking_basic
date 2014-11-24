@@ -277,9 +277,10 @@ void CCZAssitSdk::changetimespeed(unsigned long uprate)
         return;
     }
     COPYDATASTRUCT cdstruc = {0};
-    cdstruc.cbData = 0;
+    unsigned long cdUprate = uprate;
+    cdstruc.cbData = sizeof(cdUprate);
     cdstruc.dwData = ChangeTimeSpeed;
-    cdstruc.lpData = (LPVOID)uprate;
+    cdstruc.lpData = (LPVOID)(&cdUprate);
     SendMessage(hcczMainWnd, WM_COPYDATA, 0, (LPARAM)(LPVOID)(&cdstruc));
     LOG("changetimespeed Done!");
 }

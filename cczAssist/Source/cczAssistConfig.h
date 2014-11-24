@@ -86,8 +86,7 @@ public:
         float srate = getConfigFloat("AppSetting_TimeSpeed");
         if (srate == 0.0f)
         {
-            setTimeSpeedRate(1.0f);
-            return 1.0f;
+            setTimeSpeedRate(0.0f);
         }
         return srate;
     }

@@ -212,6 +212,8 @@ void undoAPIHook()
 void ChangeTimeSpeedFunc(unsigned long newRate)
 {
     kSpeedRate = newRate / 1000.0f;
+    LOG("New Speed Rate:");
+    LOG(kSpeedRate);
 }
 
 // WINMM!timeGetTime
