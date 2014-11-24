@@ -71,6 +71,14 @@ public:
         }
     }
 
+    void SetTimeSpeed(float ar)
+    {
+        if (caw != NULL)
+        {
+            caw->settimegear(ar);
+        }
+    }
+
 private:
     HMODULE hAssist;
     CCZWrapperBase* caw;

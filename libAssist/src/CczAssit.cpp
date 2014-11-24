@@ -319,14 +319,22 @@ void CCZAssitWrapper::startccz(const string& path)
     }
 }
 
+#define CHECK_NULL_HANDLE(a, b)     if (((a) == NULL)) \
+{\
+    LOG((b));\
+    return;\
+}
+
 void CCZAssitWrapper::autoclick()
 {
+    CHECK_NULL_HANDLE(cczProcInfo.hProcess, "CCZ is not running!");
     cczAssist.hookkeybdto_ccz(TEXT("libIPCO.dll"),TEXT("HookKeybdProc"), cczProcInfo.dwThreadId);
     cczAssist.autosend_mouseclick(cczAssist.get_ccz_mainwnd(cczProcInfo.dwThreadId), 90);
 }
 
 void CCZAssitWrapper::settimegear(float timeuprate)
 {
+    CHECK_NULL_HANDLE(cczProcInfo.hProcess, "CCZ is not running!");
     if (!bTimeHooked)
     {
         cczAssist.hookwndprocto_ccz(TEXT("libIPCO.dll"), TEXT("HookCallWndProc"), cczProcInfo.dwThreadId);
@@ -343,11 +351,13 @@ void CCZAssitWrapper::settimegear(float timeuprate)
 
 void CCZAssitWrapper::stopautoclick()
 {
+    CHECK_NULL_HANDLE(cczProcInfo.hProcess, "CCZ is not running!");
     cczAssist.stop_autosend();
 }
 
 void CCZAssitWrapper::writetoccz(unsigned long offset, const byte* data, size_t len)
 {
+    CHECK_NULL_HANDLE(cczProcInfo.hProcess, "CCZ is not running!");
     if (!check_hMemDO())
     {
         LOG("libMemDO doesn't loaded!");
@@ -380,3 +390,5 @@ void ReleaseAW(CCZWrapperBase* wbObj)
 {
     delete wbObj;
 }
+
+#undef CHECK_NULL_HANDLE

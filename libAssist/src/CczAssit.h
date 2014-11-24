@@ -106,7 +106,10 @@ public:
         , bgetDbgPriv(false)
         , bTimeHooked(false)
     {
-        
+        cczProcInfo.hProcess = NULL;
+        cczProcInfo.hThread = NULL;
+        cczProcInfo.dwProcessId = 0;
+        cczProcInfo.dwThreadId = 0;
     }
 
     ~CCZAssitWrapper()

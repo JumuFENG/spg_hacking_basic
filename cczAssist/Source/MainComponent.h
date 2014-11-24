@@ -20,6 +20,7 @@
 class MainContentComponent   : public Component
     , public ButtonListener
     , public TextEditorListener
+    , public SliderListener
 {
 public:
     //==============================================================================
@@ -29,8 +30,9 @@ public:
     void paint (Graphics&);
     void resized();
 
-    void buttonClicked(Button* btnThatClicked);
+    void buttonClicked(Button* );
     void textEditorTextChanged (TextEditor&);
+    void sliderValueChanged (Slider* );
 
 public:
     TextButton  btn_Exec;
@@ -44,6 +46,8 @@ public:
     Label       lbl_Offset;
     TextEditor  edt_Offset;
     TextEditor  edt_NewBytes;
+
+    Slider      timespeed_Slider;
 
 private:
     //==============================================================================

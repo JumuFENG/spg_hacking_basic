@@ -55,6 +55,21 @@ MainContentComponent::MainContentComponent()
     lbl_Offset.setSize(70, 25);
     edt_NewBytes.setSize(200, 100);
     edt_NewBytes.setMultiLine(true);
+
+    timespeed_Slider.setSliderStyle(Slider::LinearVertical);
+    timespeed_Slider.setRange(-20, 20, 1.0);
+    float sldVal = cczAssistAppConfig::getInstance()->getTimeSpeedRate();
+    if (sldVal != 1.0f)
+    {
+        cczAssistLibLoader::getInstance()->SetTimeSpeed(sldVal);
+    }
+    sldVal = sldVal < 1.0f ? 1.0f / (-sldVal) : sldVal - 1.0f;
+    timespeed_Slider.setValue(sldVal, dontSendNotification);
+    timespeed_Slider.setChangeNotificationOnlyOnRelease(true);
+    timespeed_Slider.setTextBoxStyle(Slider::TextBoxAbove, false, 50, 20);
+    timespeed_Slider.addListener(this);
+    timespeed_Slider.setSize(60, 135);
+
     addAndMakeVisible(lbl_Path_ccz);
     addAndMakeVisible(edt_Path_ccz);
     addAndMakeVisible(btn_Exec);
@@ -64,6 +79,7 @@ MainContentComponent::MainContentComponent()
     addAndMakeVisible(edt_Offset);
     addAndMakeVisible(lbl_Offset);
     addAndMakeVisible(edt_NewBytes);
+    addAndMakeVisible(timespeed_Slider);
 }
 
 MainContentComponent::~MainContentComponent()
@@ -102,6 +118,9 @@ void MainContentComponent::resized()
     edt_Offset.setTopLeftPosition(topx, topy);
     topy += 40;
     btn_SetMem.setTopLeftPosition(topx, topy);
+
+    topx += 80; topy -= 95;
+    timespeed_Slider.setTopLeftPosition(topx, topy);
 }
 
 void MainContentComponent::buttonClicked(Button* btnThatClicked)
@@ -172,5 +191,17 @@ void MainContentComponent::textEditorTextChanged (TextEditor& edt)
             String( (edt_Path_ccz.isEmpty() || !File(edt_Path_ccz.getText()).exists() ||
             File(edt_Path_ccz.getText()).isDirectory())
             ? "cczAssistMain_btn_Browse" : "cczAssistMain_btn_Run")));
+    }
+}
+
+
+void MainContentComponent::sliderValueChanged (Slider* slider)
+{
+    if (slider == &timespeed_Slider)
+    {
+        float sldVal = timespeed_Slider.getValue();
+        sldVal = sldVal < 0 ? 1.0f / (-sldVal) : sldVal + 1.0f;
+        cczAssistLibLoader::getInstance()->SetTimeSpeed(sldVal);
+        cczAssistAppConfig::getInstance()->setTimeSpeedRate(sldVal);
     }
 }

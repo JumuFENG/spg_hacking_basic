@@ -81,6 +81,22 @@ public:
         varAppConfig.getDynamicObject()->setProperty("AppSetting_CczInstallPath", path);
     }
 
+    float getTimeSpeedRate()
+    {
+        float srate = getConfigFloat("AppSetting_TimeSpeed");
+        if (srate == 0.0f)
+        {
+            setTimeSpeedRate(1.0f);
+            return 1.0f;
+        }
+        return srate;
+    }
+
+    void setTimeSpeedRate(float aR)
+    {
+        varAppConfig.getDynamicObject()->setProperty("AppSetting_TimeSpeed", aR);
+    }
+
 private:
     String getConfigStr(const String& cfgId)
     {
@@ -95,6 +111,11 @@ private:
     size_t getConfigSize(const String& cfgId)
     {
         return int(varAppConfig[(Identifier)cfgId]);
+    }
+
+    float getConfigFloat(const String& cfgId)
+    {
+        return float(varAppConfig[(Identifier)cfgId]);
     }
 
 private:
