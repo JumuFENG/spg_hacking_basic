@@ -96,7 +96,12 @@ CCZAssitSdk::CCZAssitSdk()
 {
 }
 
-CCZAssitSdk::~CCZAssitSdk()
+void CCZAssitSdk::initall()
+{
+    bStop = false;
+}
+
+void CCZAssitSdk::resetall()
 {
     bStop = true;
     if (hhookKeybdMsg)
@@ -123,10 +128,19 @@ CCZAssitSdk::~CCZAssitSdk()
     }
     if (hAutoClickEvt != NULL)
     {
+        SetEvent(hAutoClickEvt);
         CloseHandle(hAutoClickEvt);
         hAutoClickEvt = NULL;
     }
 
+    hcczMainWnd = NULL;
+    stillClickOnBg = true;
+    invalidHeight = 0;
+}
+
+CCZAssitSdk::~CCZAssitSdk()
+{
+    resetall();
 }
 
 BOOL CALLBACK  CCZAssitSdk::EnumThreadWindowProc(HWND hwnd, LPARAM lParam)
@@ -285,6 +299,15 @@ void CCZAssitSdk::changetimespeed(unsigned long uprate)
     LOG("changetimespeed Done!");
 }
 
+void CCZAssitWrapper::reset()
+{
+    bTimeHooked = false;
+    cczProcInfo.hProcess = NULL;
+    cczProcInfo.hThread = NULL;
+    cczProcInfo.dwProcessId = 0;
+    cczProcInfo.dwThreadId = 0;
+}
+
 bool CCZAssitWrapper::check_hMemDO()
 {
     if (hMemDO == NULL)
@@ -316,6 +339,9 @@ void CCZAssitWrapper::startccz(const string& path)
 {
     if (!cczAssist.isprocessrunning(util_win::to_tstring(path)))
     {
+        cczAssist.resetall();
+        cczAssist.initall();
+        reset();
         cczAssist.startprocess(util_win::to_tstring(path), cczProcInfo);
     }
 }

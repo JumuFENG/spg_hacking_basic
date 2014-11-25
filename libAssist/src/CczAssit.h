@@ -69,6 +69,8 @@ public:
     void hookwndprocto_ccz(const tstring& dllFile, const tstring& procname, DWORD tid);
     bool sendsettimehook();
     void changetimespeed(unsigned long uprate);
+    void initall();
+    void resetall();
 
 private:
     static bool bStop;
@@ -123,6 +125,7 @@ private:
     // this will delay the dll to load when needed, and load only one instance
     bool check_hMemDO();
     bool enableDebugPrivilege();
+    void reset();
 
 public:
     // the following are exported
