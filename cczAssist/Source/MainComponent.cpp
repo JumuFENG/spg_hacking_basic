@@ -58,12 +58,8 @@ MainContentComponent::MainContentComponent()
 
     timespeed_Slider.setSliderStyle(Slider::LinearVertical);
     timespeed_Slider.setRange(-20, 20, 1.0);
-    float sldVal = cczAssistAppConfig::getInstance()->getTimeSpeedRate();
-    if (sldVal != 0.0f)
-    {
-        cczAssistLibLoader::getInstance()->SetTimeSpeed(sldVal);
-    }
-    timespeed_Slider.setValue(sldVal, dontSendNotification);
+    timespeed_Slider.setValue(cczAssistAppConfig::getInstance()
+        ->getTimeSpeedRate(), dontSendNotification);
     timespeed_Slider.setChangeNotificationOnlyOnRelease(true);
     timespeed_Slider.setTextBoxStyle(Slider::TextBoxAbove, false, 50, 20);
     timespeed_Slider.addListener(this);
@@ -151,6 +147,10 @@ void MainContentComponent::buttonClicked(Button* btnThatClicked)
             if (chkbx_AutoClk.getToggleState() && btn_AutoClk.getToggleState())
             {
                 cczAssistLibLoader::getInstance()->AutoClickCczMain();
+            }
+            if (timespeed_Slider.getValue() != 0.0f)
+            {
+                cczAssistLibLoader::getInstance()->SetTimeSpeed(timespeed_Slider.getValue());
             }
         }
     }
