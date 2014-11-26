@@ -46,8 +46,12 @@ public:
     Label       lbl_Offset;
     TextEditor  edt_Offset;
     TextEditor  edt_NewBytes;
+    ToggleButton chkbx_SaveRecd;
+    TextEditor  edt_SaveRecName;
+    TextButton  btn_SaveRecd;
 
     Slider      timespeed_Slider;
+    Label       timespeed_label;
 
 private:
     //==============================================================================
