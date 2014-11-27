@@ -16,6 +16,7 @@
 juce_ImplementSingleton(cczAssistLanguageSetting);
 juce_ImplementSingleton(cczAssistLibLoader);
 juce_ImplementSingleton(cczAssistAppConfig);
+juce_ImplementSingleton(cczAssistUILayout);
 
 //==============================================================================
 class cczAssistApplication  : public JUCEApplication
@@ -41,6 +42,7 @@ public:
         cczAssistLanguageSetting::getInstance()->deleteInstance();
         cczAssistLibLoader::getInstance()->deleteInstance();
         cczAssistAppConfig::getInstance()->deleteInstance();
+        cczAssistUILayout::getInstance()->deleteInstance();
         mainWindow = nullptr; // (deletes our window)
     }
 

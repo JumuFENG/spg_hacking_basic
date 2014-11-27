@@ -38,6 +38,35 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (cczAssistLanguageSetting);
 };
 
+class cczAssistUILayout{
+public:
+    cczAssistUILayout()
+    {
+        File jsonFile = File::getCurrentWorkingDirectory().getChildFile(
+            "settings/layout.json");
+        if (jsonFile.exists())
+        {
+            varUIElem = JSON::parse(jsonFile);
+        }
+    }
+    ~cczAssistUILayout()
+    {
+
+    }
+    juce_DeclareSingleton(cczAssistUILayout, false);
+
+    juce::Rectangle<int> GetUILayout(const String& s)
+    {
+        return juce::Rectangle<int>::fromString(varUIElem[(Identifier)s].toString());
+    }
+
+    juce::Rectangle<int> GetUIPos();
+
+private:
+    var    varUIElem;
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(cczAssistUILayout);
+};
+
 class cczAssistAppConfig{
 public:
     cczAssistAppConfig()

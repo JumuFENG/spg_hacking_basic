@@ -74,4 +74,9 @@ namespace InputStringConverter {
 
 }
 
+namespace UILayoutConverter{
+    inline void Set_Comp_Pos(Component* c, const String& p);
+    inline void Set_Comp_Size(Component* c, const String& s);
+}
+
 #endif // CCZ_INPUTSTRING_CONVERTER_H

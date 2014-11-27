@@ -1,0 +1,22 @@
+{
+  "UL_MainWindow_Rect": "0 0 500 400",
+
+  "UL_Label_Path_Rect": "10 5 55 25",
+  "UL_Edt_Path_Rect": "80 5 300 25",
+  "UL_Btn_Exec_Rect": "390 5 90 25",
+
+  "UL_Chkbx_AutoClick_Rect": "50 35 100 22",
+  "UL_Btn_AutoClick_Rect": "165 35 80 22",
+  "UL_Label_TimeSpd_Rect": "265 37 35 20",
+  "UL_Slider_TimeSpd_Rect": "295 35 180 20",
+
+  "UL_Label_Offset_Rect": "10 65 70 25",
+  "UL_Edt_Offset_Rect": "80 65 70 25",
+  "UL_Btn_SetMem_Rect": "175 65 70 25",
+  "UL_Edt_NewBytes_Rect": "15 95 230 60",
+  "UL_Chkbx_SaveRec_Rect": "10 165 100 25",
+  "UL_Edt_SaveRec_Rect": "110 165 70 25",
+  "UL_Btn_SaveRec_Rect": "190 165 55 25",
+
+  "a":"b"
+}

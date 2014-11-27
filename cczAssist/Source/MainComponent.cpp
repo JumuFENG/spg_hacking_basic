@@ -14,10 +14,24 @@
 using InputStringConverter::convetinputtoulong;
 using InputStringConverter::convertinputbytes;
 
+namespace UILayoutConverter{
+    void Set_Comp_Pos(Component* c, const String& p)
+    {
+        juce::Rectangle<int> sz = cczAssistUILayout::getInstance()->GetUILayout(p);
+        c->setTopLeftPosition(sz.getX(), sz.getY());
+    }
+
+    void Set_Comp_Size(Component* c, const String& s)
+    {
+        juce::Rectangle<int> sz = cczAssistUILayout::getInstance()->GetUILayout(s);
+        c->setSize(sz.getWidth(), sz.getHeight());//(55, 25);
+    }
+}
+
 //==============================================================================
 MainContentComponent::MainContentComponent()
 {
-    setSize (500, 400);
+    UILayoutConverter::Set_Comp_Size(this, "UL_MainWindow_Rect");
     lbl_Path_ccz.setText(cczAssistLanguageSetting::getInstance()->getUIText(
         String("cczAssistMain_Label_Path")), dontSendNotification);
     edt_Path_ccz.setText(cczAssistAppConfig::getInstance()->getAppCczInstallPath());
@@ -28,21 +42,21 @@ MainContentComponent::MainContentComponent()
         "cczAssistMain_btn_Run") ));
     btn_Exec.addListener(this);
 
-    lbl_Path_ccz.setSize(55, 25);
-    edt_Path_ccz.setSize(300, 25);
-    btn_Exec.setSize(90, 25);
+    UILayoutConverter::Set_Comp_Size(&lbl_Path_ccz, "UL_Label_Path_Rect");
+    UILayoutConverter::Set_Comp_Size(&edt_Path_ccz, "UL_Edt_Path_Rect");
+    UILayoutConverter::Set_Comp_Size(&btn_Exec, "UL_Btn_Exec_Rect");
 
+    UILayoutConverter::Set_Comp_Size(&chkbx_AutoClk, "UL_Chkbx_AutoClick_Rect");
     chkbx_AutoClk.setButtonText(cczAssistLanguageSetting::getInstance()->
         getUIText(String("cczAssistMain_chkbx_Autoclk")));
     chkbx_AutoClk.setToggleState(cczAssistAppConfig::getInstance()->
         getAutoSendClick(), dontSendNotification);
     chkbx_AutoClk.addListener(this);
-    chkbx_AutoClk.setSize(100, 22);
+    UILayoutConverter::Set_Comp_Size(&btn_AutoClk, "UL_Btn_AutoClick_Rect");
     btn_AutoClk.setButtonText(cczAssistLanguageSetting::getInstance()->
         getUIText(String(chkbx_AutoClk.getToggleState() 
         ? "cczAssistMain_btn_Autoclk"
         :"cczAssistMain_btn_noAutoclk")));
-    btn_AutoClk.setSize(80, 22);
     btn_AutoClk.setToggleState(chkbx_AutoClk.getToggleState(),dontSendNotification);
     btn_AutoClk.addListener(this);
 
@@ -59,18 +73,19 @@ MainContentComponent::MainContentComponent()
     btn_SaveRecd.setEnabled(false);
     btn_SaveRecd.addListener(this);
     edt_SaveRecName.setEnabled(false);
-    btn_SetMem.setSize(70, 25);
-    edt_Offset.setSize(70, 25);
-    lbl_Offset.setSize(70, 25);
-    chkbx_SaveRecd.setSize(100, 25);
-    edt_SaveRecName.setSize(70, 25);
-    btn_SaveRecd.setSize(55, 25);
-    edt_NewBytes.setSize(230, 60);
+    UILayoutConverter::Set_Comp_Size(&btn_SetMem, "UL_Btn_SetMem_Rect");
+    UILayoutConverter::Set_Comp_Size(&edt_Offset, "UL_Edt_Offset_Rect");
+    UILayoutConverter::Set_Comp_Size(&lbl_Offset, "UL_Label_Offset_Rect");
+    UILayoutConverter::Set_Comp_Size(&chkbx_SaveRecd, "UL_Chkbx_SaveRec_Rect");
+    UILayoutConverter::Set_Comp_Size(&edt_SaveRecName, "UL_Edt_SaveRec_Rect");
+    UILayoutConverter::Set_Comp_Size(&btn_SaveRecd, "UL_Btn_SaveRec_Rect");
+    UILayoutConverter::Set_Comp_Size(&edt_NewBytes, "UL_Edt_NewBytes_Rect");
+
     edt_NewBytes.setMultiLine(true);
 
     timespeed_label.setText(cczAssistLanguageSetting::getInstance()->
         getUIText("cczAssistMain_Label_TimeSpeed"), dontSendNotification);
-    timespeed_label.setSize(35, 20);
+    UILayoutConverter::Set_Comp_Size(&timespeed_label, "UL_Label_TimeSpd_Rect");
     timespeed_Slider.setSliderStyle(Slider::LinearHorizontal);
     timespeed_Slider.setRange(-20, 20, 1.0);
     timespeed_Slider.setValue(cczAssistAppConfig::getInstance()
@@ -78,7 +93,7 @@ MainContentComponent::MainContentComponent()
     timespeed_Slider.setChangeNotificationOnlyOnRelease(true);
     timespeed_Slider.setTextBoxStyle(Slider::TextBoxRight, false, 30, 20);
     timespeed_Slider.addListener(this);
-    timespeed_Slider.setSize(180, 20);
+    UILayoutConverter::Set_Comp_Size(&timespeed_Slider, "UL_Slider_TimeSpd_Rect");
 
     addAndMakeVisible(lbl_Path_ccz);
     addAndMakeVisible(edt_Path_ccz);
@@ -113,37 +128,22 @@ void MainContentComponent::resized()
     // This is called when the MainContentComponent is resized.
     // If you add any child components, this is where you should
     // update their positions.
-    int topx = 10, topy = 5;
-    lbl_Path_ccz.setTopLeftPosition(topx, topy);
-    topx += 70;
-    edt_Path_ccz.setTopLeftPosition(topx, topy);
-    topx += 310;
-    btn_Exec.setTopLeftPosition(topx, topy);
+    UILayoutConverter::Set_Comp_Pos(&lbl_Path_ccz, "UL_Label_Path_Rect");
+    UILayoutConverter::Set_Comp_Pos(&edt_Path_ccz, "UL_Edt_Path_Rect");
+    UILayoutConverter::Set_Comp_Pos(&btn_Exec, "UL_Btn_Exec_Rect");
 
-    topx = 50; topy += 30;
-    chkbx_AutoClk.setTopLeftPosition(topx, topy);
-    topx += 115;
-    btn_AutoClk.setTopLeftPosition(topx, topy);
-    topx += 100;
-    timespeed_label.setTopLeftPosition(topx, topy + 2);
-    topx += 30; 
-    timespeed_Slider.setTopLeftPosition(topx, topy);
+    UILayoutConverter::Set_Comp_Pos(&chkbx_AutoClk, "UL_Chkbx_AutoClick_Rect");
+    UILayoutConverter::Set_Comp_Pos(&btn_AutoClk, "UL_Btn_AutoClick_Rect");    
+    UILayoutConverter::Set_Comp_Pos(&timespeed_label, "UL_Label_TimeSpd_Rect");
+    UILayoutConverter::Set_Comp_Pos(&timespeed_Slider, "UL_Slider_TimeSpd_Rect");
 
-    topx = 10; topy += 30;
-    lbl_Offset.setTopLeftPosition(topx, topy);
-    topx += 70;
-    edt_Offset.setTopLeftPosition(topx, topy);
-    topx += 95;
-    btn_SetMem.setTopLeftPosition(topx, topy);
-    topx = 10; topy += 30;
-    edt_NewBytes.setTopLeftPosition(topx + 5, topy);
-    topy += 70;
-    chkbx_SaveRecd.setTopLeftPosition(topx, topy);
-    topx += 100;
-    edt_SaveRecName.setTopLeftPosition(topx, topy);
-    topx += 80;
-    btn_SaveRecd.setTopLeftPosition(topx, topy);
-
+    UILayoutConverter::Set_Comp_Pos(&lbl_Offset, "UL_Label_Offset_Rect");
+    UILayoutConverter::Set_Comp_Pos(&edt_Offset, "UL_Edt_Offset_Rect");
+    UILayoutConverter::Set_Comp_Pos(&btn_SetMem, "UL_Btn_SetMem_Rect");
+    UILayoutConverter::Set_Comp_Pos(&edt_NewBytes, "UL_Edt_NewBytes_Rect");
+    UILayoutConverter::Set_Comp_Pos(&chkbx_SaveRecd, "UL_Chkbx_SaveRec_Rect");
+    UILayoutConverter::Set_Comp_Pos(&edt_SaveRecName, "UL_Edt_SaveRec_Rect");
+    UILayoutConverter::Set_Comp_Pos(&btn_SaveRecd, "UL_Btn_SaveRec_Rect");
 }
 
 void MainContentComponent::buttonClicked(Button* btnThatClicked)

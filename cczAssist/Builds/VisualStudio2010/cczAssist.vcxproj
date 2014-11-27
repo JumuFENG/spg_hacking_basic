@@ -82,7 +82,9 @@
       <OutputFile>$(IntDir)\cczAssist.bsc</OutputFile>
     </Bscmake>
     <PostBuildEvent>
-      <Command>xcopy $(ProjectDir)lang $(OutDir)lang /E /I /Y</Command>
+      <Command>xcopy $(ProjectDir)lang $(OutDir)lang /E /I /Y
+xcopy $(ProjectDir)settings $(OutDir)settings /E /I /Y
+del $(OutDir)settings\appconfig.json</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -129,7 +131,9 @@
       <OutputFile>$(IntDir)\cczAssist.bsc</OutputFile>
     </Bscmake>
     <PostBuildEvent>
-      <Command>xcopy $(ProjectDir)lang $(OutDir)lang /E /I /Y</Command>
+      <Command>xcopy $(ProjectDir)lang $(OutDir)lang /E /I /Y
+xcopy $(ProjectDir)settings $(OutDir)settings /E /I /Y
+del $(OutDir)settings\appconfig.json</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
