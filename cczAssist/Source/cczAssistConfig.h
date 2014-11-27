@@ -81,10 +81,16 @@ public:
         {
             varAppConfig = JSON::parse("{}");
         }
+        varUserAddedItems = varAppConfig["UserAdded"];
+        if (NULL == varUserAddedItems.getDynamicObject())
+        {
+            varUserAddedItems = JSON::parse("{}");
+        }
     }
 
     ~cczAssistAppConfig()
     {
+        varAppConfig.getDynamicObject()->setProperty("UserAdded", varUserAddedItems);
         fappcofig.replaceWithText(JSON::toString(varAppConfig));
     }
 
@@ -125,6 +131,14 @@ public:
         varAppConfig.getDynamicObject()->setProperty("AppSetting_TimeSpeed", aR);
     }
 
+    void setUserAddItem(const String& n, const String& offset, const String& val)
+    {
+        var varItem = JSON::parse("{}");
+        varItem.getDynamicObject()->setProperty("Offset", offset);
+        varItem.getDynamicObject()->setProperty("Bytes", val);
+        varUserAddedItems.getDynamicObject()->setProperty((Identifier)n, varItem);
+    }
+
 private:
     String getConfigStr(const String& cfgId)
     {
@@ -149,6 +163,7 @@ private:
 private:
     File     fappcofig;
     var      varAppConfig;
+    var      varUserAddedItems;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(cczAssistAppConfig);
 };
 

@@ -206,7 +206,11 @@ void MainContentComponent::buttonClicked(Button* btnThatClicked)
     }
     else if (btnThatClicked == &btn_SaveRecd)
     {
-        edt_SaveRecName.setText("place holder");
+        cczAssistAppConfig::getInstance()->setUserAddItem(
+            edt_SaveRecName.getText(),
+            edt_Offset.getText(),
+            edt_NewBytes.getText()
+            );
     }
     else if (btnThatClicked == &chkbx_AutoClk)
     {
