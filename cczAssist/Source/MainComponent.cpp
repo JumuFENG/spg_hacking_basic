@@ -95,6 +95,10 @@ MainContentComponent::MainContentComponent()
     timespeed_Slider.addListener(this);
     UILayoutConverter::Set_Comp_Size(&timespeed_Slider, "UL_Slider_TimeSpd_Rect");
 
+    usrRecdViewport.setScrollBarsShown(true, false, true);
+    UILayoutConverter::Set_Comp_Size(&usrRecdViewport, "UL_ViewPort_Recd_Rect");
+    usrRecdViewport.setViewedComponent(&usrRecdComp, false);
+
     addAndMakeVisible(lbl_Path_ccz);
     addAndMakeVisible(edt_Path_ccz);
     addAndMakeVisible(btn_Exec);
@@ -109,6 +113,7 @@ MainContentComponent::MainContentComponent()
     addAndMakeVisible(edt_NewBytes);
     addAndMakeVisible(timespeed_label);
     addAndMakeVisible(timespeed_Slider);
+    addAndMakeVisible(usrRecdViewport);
 }
 
 MainContentComponent::~MainContentComponent()
@@ -144,6 +149,8 @@ void MainContentComponent::resized()
     UILayoutConverter::Set_Comp_Pos(&chkbx_SaveRecd, "UL_Chkbx_SaveRec_Rect");
     UILayoutConverter::Set_Comp_Pos(&edt_SaveRecName, "UL_Edt_SaveRec_Rect");
     UILayoutConverter::Set_Comp_Pos(&btn_SaveRecd, "UL_Btn_SaveRec_Rect");
+
+    UILayoutConverter::Set_Comp_Pos(&usrRecdViewport, "UL_ViewPort_Recd_Rect");
 }
 
 void MainContentComponent::buttonClicked(Button* btnThatClicked)

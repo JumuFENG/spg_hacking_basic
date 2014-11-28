@@ -10,6 +10,7 @@
 #define MAINCOMPONENT_H_INCLUDED
 
 #include "../JuceLibraryCode/JuceHeader.h"
+#include "memModRecComp.h"
 
 
 //==============================================================================
@@ -52,6 +53,9 @@ public:
 
     Slider      timespeed_Slider;
     Label       timespeed_label;
+
+    Viewport    usrRecdViewport;
+    MemModRecComp usrRecdComp;
 
 private:
     //==============================================================================

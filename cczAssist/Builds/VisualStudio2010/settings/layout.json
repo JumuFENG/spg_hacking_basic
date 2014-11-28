@@ -18,5 +18,7 @@
   "UL_Edt_SaveRec_Rect": "110 165 70 25",
   "UL_Btn_SaveRec_Rect": "190 165 55 25",
 
+  "UL_ViewPort_Recd_Rect": "265 65 220 125",
+
   "a":"b"
 }
