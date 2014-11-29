@@ -18,7 +18,11 @@
   "UL_Edt_SaveRec_Rect": "110 165 70 25",
   "UL_Btn_SaveRec_Rect": "190 165 55 25",
 
-  "UL_ViewPort_Recd_Rect": "265 65 220 125",
+  "UL_Label_RecdLst_Rect": "265 67 60 23",
+  "UL_ViewPort_Recd_Rect": "265 90 220 75",
+  "UL_Chkbx_RecdSelAll_Rect": "265 167 60 23",
+  "UL_Btn_SavAutoApply_Rect": "365 167 50 23",
+  "UL_Btn_ApplyAllRecd_Rect": "425 167 50 23",
 
   "a":"b"
 }

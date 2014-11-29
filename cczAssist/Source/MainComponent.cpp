@@ -95,9 +95,21 @@ MainContentComponent::MainContentComponent()
     timespeed_Slider.addListener(this);
     UILayoutConverter::Set_Comp_Size(&timespeed_Slider, "UL_Slider_TimeSpd_Rect");
 
+    lbl_RecdList.setText(cczAssistLanguageSetting::getInstance()->
+        getUIText("cczAssistMain_Label_UserModRecd"), dontSendNotification);
+    UILayoutConverter::Set_Comp_Size(&lbl_RecdList, "UL_Label_RecdLst_Rect");
     usrRecdViewport.setScrollBarsShown(true, false, true);
     UILayoutConverter::Set_Comp_Size(&usrRecdViewport, "UL_ViewPort_Recd_Rect");
     usrRecdViewport.setViewedComponent(&usrRecdComp, false);
+    chkbx_RecdSelAll.setButtonText(cczAssistLanguageSetting::getInstance()->
+        getUIText("cczAssistMain_Text_SelectAll"));
+    UILayoutConverter::Set_Comp_Size(&chkbx_RecdSelAll, "UL_Chkbx_RecdSelAll_Rect");
+    btn_SaveAutoApply.setButtonText(cczAssistLanguageSetting::getInstance()->
+        getUIText("cczAssistMain_Text_Save"));
+    UILayoutConverter::Set_Comp_Size(&btn_SaveAutoApply, "UL_Btn_SavAutoApply_Rect");
+    btn_ApplyAllRecd.setButtonText(cczAssistLanguageSetting::getInstance()->
+        getUIText("cczAssistMain_Text_Apply"));
+    UILayoutConverter::Set_Comp_Size(&btn_ApplyAllRecd, "UL_Btn_ApplyAllRecd_Rect");
 
     addAndMakeVisible(lbl_Path_ccz);
     addAndMakeVisible(edt_Path_ccz);
@@ -113,7 +125,11 @@ MainContentComponent::MainContentComponent()
     addAndMakeVisible(edt_NewBytes);
     addAndMakeVisible(timespeed_label);
     addAndMakeVisible(timespeed_Slider);
+    addAndMakeVisible(lbl_RecdList);
     addAndMakeVisible(usrRecdViewport);
+    addAndMakeVisible(chkbx_RecdSelAll);
+    addAndMakeVisible(btn_SaveAutoApply);
+    addAndMakeVisible(btn_ApplyAllRecd);
 }
 
 MainContentComponent::~MainContentComponent()
@@ -150,7 +166,11 @@ void MainContentComponent::resized()
     UILayoutConverter::Set_Comp_Pos(&edt_SaveRecName, "UL_Edt_SaveRec_Rect");
     UILayoutConverter::Set_Comp_Pos(&btn_SaveRecd, "UL_Btn_SaveRec_Rect");
 
+    UILayoutConverter::Set_Comp_Pos(&lbl_RecdList, "UL_Label_RecdLst_Rect");
     UILayoutConverter::Set_Comp_Pos(&usrRecdViewport, "UL_ViewPort_Recd_Rect");
+    UILayoutConverter::Set_Comp_Pos(&chkbx_RecdSelAll, "UL_Chkbx_RecdSelAll_Rect");
+    UILayoutConverter::Set_Comp_Pos(&btn_SaveAutoApply, "UL_Btn_SavAutoApply_Rect");
+    UILayoutConverter::Set_Comp_Pos(&btn_ApplyAllRecd, "UL_Btn_ApplyAllRecd_Rect");
 }
 
 void MainContentComponent::buttonClicked(Button* btnThatClicked)

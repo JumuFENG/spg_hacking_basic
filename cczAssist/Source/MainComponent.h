@@ -54,8 +54,12 @@ public:
     Slider      timespeed_Slider;
     Label       timespeed_label;
 
+    Label       lbl_RecdList;
     Viewport    usrRecdViewport;
     MemModRecComp usrRecdComp;
+    ToggleButton  chkbx_RecdSelAll;
+    TextButton    btn_SaveAutoApply;
+    TextButton    btn_ApplyAllRecd;
 
 private:
     //==============================================================================
