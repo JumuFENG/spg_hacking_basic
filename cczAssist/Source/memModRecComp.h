@@ -15,6 +15,50 @@
 //==============================================================================
 /*
 */
+class UserRecordApplyComp 
+    : public Component
+    , public ButtonListener
+{
+public:
+    UserRecordApplyComp()
+    {
+        chkbx_Name.setSize(120, 22);
+        btn_Apply.setSize(40, 22);
+        btn_Restore.setSize(40, 22);
+
+        addAndMakeVisible(chkbx_Name);
+        addAndMakeVisible(btn_Apply);
+        addAndMakeVisible(btn_Restore);
+    }
+    ~UserRecordApplyComp(){}
+    
+    void paint(Graphics& g)
+    {
+        g.setColour (Colours::grey);
+        g.drawRect (getLocalBounds(), 1);
+    }
+
+    void resized()
+    {
+        chkbx_Name.setTopLeftPosition(3, 1);
+        btn_Apply.setTopLeftPosition(125, 1);
+        btn_Restore.setTopLeftPosition(168, 1);
+    }
+
+    void buttonClicked(Button* btnThatClicked)
+    {
+    }
+
+private:
+    ToggleButton     chkbx_Name;
+    TextButton       btn_Apply;
+    TextButton       btn_Restore;
+
+private:
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (UserRecordApplyComp)
+
+};
+
 class MemModRecComp    
     : public Component
     , public ButtonListener
@@ -53,8 +97,15 @@ public:
     {
     }
 
-private:
+public:
+    void AddUserModifyRecord(const String& name, 
+        const String& offset, const String& val)
+    {
 
+    }
+
+private:
+    std::vector<UserRecordApplyComp>     recds;
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MemModRecComp)
