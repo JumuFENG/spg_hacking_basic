@@ -32,6 +32,25 @@ public:
     }
     ~UserRecordApplyComp(){}
     
+    void InitUARecd(const String& aName, unsigned long off_, std::vector<byte> bs)
+    {
+        offset = off_;
+        udName = aName;
+        usBytes = bs;
+        //获取该偏移处 usBytes.size() 个原始值
+        oldBytes = ;
+    }
+
+    void SetToCczMem()
+    {
+
+    }
+
+    void RestoreCczMem()
+    {
+
+    }
+
     void paint(Graphics& g)
     {
         g.setColour (Colours::grey);
@@ -50,9 +69,13 @@ public:
     }
 
 private:
-    ToggleButton     chkbx_Name;
-    TextButton       btn_Apply;
-    TextButton       btn_Restore;
+    ToggleButton      chkbx_Name;
+    TextButton        btn_Apply;
+    TextButton        btn_Restore;
+    String            udName;     //user defined name
+    unsigned long     offset;
+    std::vector<byte> usBytes;    // usser set bytes
+    std::vector<byte> oldBytes;
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (UserRecordApplyComp)
