@@ -11,6 +11,15 @@
 #define CCZ_MEM_MOD_RECORD_COMPONENT_HEADER
 
 #include "JuceHeader.h"
+#include "cczAssistLibLoader.h"
+#include "InputStringConverter.h"
+#include "cczAssistConfig.h"
+
+using InputStringConverter::convertinputtoulong;
+using InputStringConverter::convertinputbytes;
+
+using UILayoutConverter::Set_Comp_Pos;
+using UILayoutConverter::Set_Comp_Size;
 
 //==============================================================================
 /*
@@ -22,9 +31,9 @@ class UserRecordApplyComp
 public:
     UserRecordApplyComp()
     {
-        chkbx_Name.setSize(120, 22);
-        btn_Apply.setSize(40, 22);
-        btn_Restore.setSize(40, 22);
+        Set_Comp_Size(&chkbx_Name, "UL_Rcd_NameChkbx_Rect");
+        Set_Comp_Size(&btn_Apply, "UL_Rcd_Applybtn_Rect");
+        Set_Comp_Size(&btn_Restore, "UL_Rcd_Restorebtn_Rect");
 
         addAndMakeVisible(chkbx_Name);
         addAndMakeVisible(btn_Apply);
@@ -38,34 +47,57 @@ public:
         udName = aName;
         usBytes = bs;
         //获取该偏移处 usBytes.size() 个原始值
-        oldBytes = ;
+        oldBytes = cczAssistLibLoader::getInstance()->GetCczMemory(
+            offset, usBytes.size());
+
+        chkbx_Name.setButtonText(udName);
     }
 
     void SetToCczMem()
     {
-
+        if (!usBytes.empty())
+        {
+            cczAssistLibLoader::getInstance()->SetCczMemory(offset, 
+                (byte*)&usBytes[0], usBytes.size());
+        }
     }
 
     void RestoreCczMem()
     {
-
+        if (!oldBytes.empty())
+        {
+            cczAssistLibLoader::getInstance()->SetCczMemory(offset, 
+                (byte*)&oldBytes[0], oldBytes.size());
+        }
     }
 
     void paint(Graphics& g)
     {
-        g.setColour (Colours::grey);
-        g.drawRect (getLocalBounds(), 1);
+//         g.setColour (Colours::grey);
+//         g.drawRect (getLocalBounds(), 1);
     }
 
     void resized()
     {
-        chkbx_Name.setTopLeftPosition(3, 1);
-        btn_Apply.setTopLeftPosition(125, 1);
-        btn_Restore.setTopLeftPosition(168, 1);
+        Set_Comp_Pos(&chkbx_Name, "UL_Rcd_NameChkbx_Rect");
+        Set_Comp_Pos(&btn_Apply, "UL_Rcd_Applybtn_Rect");
+        Set_Comp_Pos(&btn_Restore, "UL_Rcd_Restorebtn_Rect");
+        btn_Apply.setButtonText(cczAssistLanguageSetting::getInstance()->getUIText(
+            String("cczAssistMain_Text_Apply")));
+        btn_Restore.setButtonText(cczAssistLanguageSetting::getInstance()->getUIText(
+            String("cczAssistMain_Text_Restore")));
     }
 
     void buttonClicked(Button* btnThatClicked)
     {
+        if (btnThatClicked == &btn_Apply)
+        {
+            SetToCczMem();
+        }
+        else if (btnThatClicked == &btn_Restore)
+        {
+            RestoreCczMem();
+        }
     }
 
 private:
@@ -84,14 +116,23 @@ private:
 
 class MemModRecComp    
     : public Component
-    , public ButtonListener
 {
 public:
     MemModRecComp() 
     {
         // In your constructor, you should add any child components, and
         // initialise any special settings that your component needs.
-        setSize(200, 600);
+        var itms = cczAssistAppConfig::getInstance()->getUserAddItems();
+        if (itms.isArray())
+        {
+            for (int i = 0; i < itms.size(); ++i)
+            {
+                AddUserModifyRecord(itms[i].getDynamicObject()->getProperty("Name"),
+                    itms[i].getDynamicObject()->getProperty("Offset"),
+                    itms[i].getDynamicObject()->getProperty("Bytes"));
+            }
+        }
+        Set_Comp_Size(this, "UL_Rcd_ViewPort_Main_Rect");
     }
 
     ~MemModRecComp()
@@ -113,22 +154,38 @@ public:
 
     void resized()
     {
-
-    }
-
-    void buttonClicked(Button* btnThatClicked)
-    {
+        juce::Rectangle<int> singleRcdCmp = cczAssistUILayout::getInstance()
+            ->GetUILayout("UL_Rcd_Cmp_Rect");
+        int ht = singleRcdCmp.getHeight();
+        int x = singleRcdCmp.getX();
+        int y = singleRcdCmp.getY();
+        int wd = singleRcdCmp.getWidth();
+        int deltaY = 0;
+        for (std::vector<std::shared_ptr<UserRecordApplyComp> >::iterator 
+            itRecd = recds.begin(); itRecd != recds.end(); ++itRecd)
+        {
+            (*itRecd)->setBounds(x, y + deltaY, wd, ht);
+            deltaY += ht;
+        }
+        if (deltaY > getHeight())
+        {
+            setSize(getWidth(), y + deltaY + 1);
+        }
     }
 
 public:
     void AddUserModifyRecord(const String& name, 
         const String& offset, const String& val)
     {
-
+        std::shared_ptr<UserRecordApplyComp> ura = 
+            std::shared_ptr<UserRecordApplyComp>(new UserRecordApplyComp());
+        ura->InitUARecd(name, convertinputtoulong(offset), convertinputbytes(val.trim()));
+        addAndMakeVisible(ura.get());
+        recds.push_back(ura);
     }
 
 private:
-    std::vector<UserRecordApplyComp>     recds;
+    std::vector<std::shared_ptr<UserRecordApplyComp> >     recds;
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MemModRecComp)

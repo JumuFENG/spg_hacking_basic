@@ -82,10 +82,6 @@ public:
             varAppConfig = JSON::parse("{}");
         }
         varUserAddedItems = varAppConfig["UserAdded"];
-        if (NULL == varUserAddedItems.getDynamicObject())
-        {
-            varUserAddedItems = JSON::parse("{}");
-        }
     }
 
     ~cczAssistAppConfig()
@@ -133,10 +129,34 @@ public:
 
     void setUserAddItem(const String& n, const String& offset, const String& val)
     {
-        var varItem = JSON::parse("{}");
-        varItem.getDynamicObject()->setProperty("Offset", offset);
-        varItem.getDynamicObject()->setProperty("Bytes", val);
-        varUserAddedItems.getDynamicObject()->setProperty((Identifier)n, varItem);
+        bool bFound = false;
+        if (varUserAddedItems.isArray())
+        {
+            for (int i = 0; i < varUserAddedItems.size(); ++i)
+            {
+                DynamicObject* dobj = varUserAddedItems[i].getDynamicObject();
+                if (dobj->getProperty("Name") == n)
+                {
+                    bFound = true;
+                    dobj->setProperty("Offset", offset);
+                    dobj->setProperty("Bytes", val);
+                    break;
+                }
+            }
+        }
+        if (!bFound)
+        {
+            var varItem = JSON::parse("{}");
+            varItem.getDynamicObject()->setProperty("Name", n);
+            varItem.getDynamicObject()->setProperty("Offset", offset);
+            varItem.getDynamicObject()->setProperty("Bytes", val);
+            varUserAddedItems.append(varItem);
+        }
+    }
+
+    var getUserAddItems()
+    {
+        return varUserAddedItems;
     }
 
 private:

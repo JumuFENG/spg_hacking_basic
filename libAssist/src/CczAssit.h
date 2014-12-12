@@ -97,6 +97,7 @@ public:
     virtual void settimegear(float timeuprate) = 0;
     virtual void stopautoclick() = 0;
     virtual void writetoccz(unsigned long, const byte*, size_t) = 0;
+    virtual void readfromccz(unsigned long, const byte*, size_t) = 0;
 };
 
 class CCZAssitWrapper 
@@ -134,6 +135,7 @@ public:
     void stopautoclick();
     void settimegear(float timeuprate);
     void writetoccz(unsigned long offset, const byte* data, size_t len);
+    void readfromccz(unsigned long offset, const byte* data, size_t len);
 
 private:
     CCZAssitSdk cczAssist;

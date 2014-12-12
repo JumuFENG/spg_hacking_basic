@@ -24,5 +24,11 @@
   "UL_Btn_SavAutoApply_Rect": "365 167 50 23",
   "UL_Btn_ApplyAllRecd_Rect": "425 167 50 23",
 
+  "UL_Rcd_ViewPort_Main_Rect": "0 0 200 150",
+  "UL_Rcd_Cmp_Rect": "1 1 198 23",
+  "UL_Rcd_NameChkbx_Rect": "1 1 115 21",
+  "UL_Rcd_Applybtn_Rect": "118 1 40 21",
+  "UL_Rcd_Restorebtn_Rect": "159 1 40 21",
+
   "a":"b"
 }

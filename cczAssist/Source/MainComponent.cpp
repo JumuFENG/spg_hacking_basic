@@ -11,7 +11,7 @@
 #include "cczAssistLibLoader.h"
 #include "InputStringConverter.h"
 
-using InputStringConverter::convetinputtoulong;
+using InputStringConverter::convertinputtoulong;
 using InputStringConverter::convertinputbytes;
 
 namespace UILayoutConverter{
@@ -212,7 +212,7 @@ void MainContentComponent::buttonClicked(Button* btnThatClicked)
     else if (btnThatClicked == &btn_SetMem)
     {
         String strOffset = edt_Offset.getText().trim();
-        unsigned long offset = convetinputtoulong(strOffset);
+        unsigned long offset = convertinputtoulong(strOffset);
         String strNewBytes = edt_NewBytes.getText().trim();
         std::vector<byte> newBytes = convertinputbytes(strNewBytes);
         if (!newBytes.empty() && offset != 0)

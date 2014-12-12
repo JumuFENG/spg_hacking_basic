@@ -408,6 +408,23 @@ void CCZAssitWrapper::writetoccz(unsigned long offset, const byte* data, size_t 
     }
 }
 
+void CCZAssitWrapper::readfromccz(unsigned long offset, const byte* data, size_t len)
+{
+    CHECK_NULL_HANDLE(cczProcInfo.hProcess, "CCZ is not running!");
+    if (!check_hMemDO())
+    {
+        LOG("libMemDO doesn't loaded!");
+        return;
+    }
+    typedef int(*mdo_Mod_GetMemProc)(const tstring&, unsigned long, const byte*, size_t);
+    mdo_Mod_GetMemProc mdo_mod_getmem = (mdo_Mod_GetMemProc)GetProcAddress(hMemDO, "mdo_modify_memory");
+    if (mdo_mod_getmem != NULL)
+    {
+        mdo_mod_getmem(tstring(_T("Ekd5.exe")), offset, data, len);
+        LOG("Read memory done!");
+    }
+}
+
 CCZWrapperBase* GetAssistWrapperObject()
 {
     return new CCZAssitWrapper();

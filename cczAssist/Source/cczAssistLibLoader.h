@@ -71,6 +71,30 @@ public:
         }
     }
 
+    std::vector<byte> GetCczMemory(unsigned long offset, size_t len)
+    {
+        std::vector<byte> mem;
+        if (caw != NULL)
+        {
+            byte* pbytes = new byte[len];
+            size_t rsize = len;
+            caw->readfromccz(offset, pbytes, rsize);
+            if (rsize == len)
+            {
+                for (size_t i = 0; i < rsize; ++i)
+                {
+                    mem.push_back(pbytes[i]);
+                }
+            }
+            if (pbytes != NULL)
+            {
+                delete[] pbytes;
+                pbytes = NULL;
+            }
+        }
+        return mem;
+    }
+
     void SetTimeSpeed(float ar)
     {
         if (caw != NULL)

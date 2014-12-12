@@ -12,7 +12,7 @@
 #include "JuceHeader.h"
 
 namespace InputStringConverter {
-    unsigned long convetinputtoulong(const String& strOffset)
+    unsigned long inline convertinputtoulong(const String& strOffset)
     {
         int64 offset = 0;
         if (strOffset.startsWith("0x") || strOffset.startsWith("0X")
@@ -42,7 +42,7 @@ namespace InputStringConverter {
         return (unsigned long)offset;
     }
 
-    std::vector<byte> convertinputbytes(const String& strBytes)
+    std::vector<byte> inline convertinputbytes(const String& strBytes)
     {
         // When encountered char that is not valid hex, treat as sepereator
         // every two chars construct a byte, if only one will treat start with 0

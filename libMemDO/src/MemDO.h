@@ -16,4 +16,15 @@
 int mdo_modify_memory(const tstring& strProcName, unsigned long offset,
     const byte* content, size_t nsize);
 
+/**
+ * @param strProcName [in] 进程名
+ * @param offset [in] 要替换的内存地址相对于进程起始地址的偏移量
+ * @param content [out] 获取到的内容
+ * @param nsize [in-out] 字节数
+ * @ret 成功返回0
+ * 由调用者分配content内存
+ */
+int mdo_get_memory(const tstring& strProcName, unsigned long offset,
+    const char* content, size_t& nsize);
+
 #endif //MEM_DYNAMIC_OPERATE_HEADER_
