@@ -38,19 +38,26 @@ public:
         addAndMakeVisible(chkbx_Name);
         addAndMakeVisible(btn_Apply);
         addAndMakeVisible(btn_Restore);
+
+        chkbx_Name.addListener(this);
+        btn_Apply.addListener(this);
+        btn_Restore.addListener(this);
     }
     ~UserRecordApplyComp(){}
     
-    void InitUARecd(const String& aName, unsigned long off_, std::vector<byte> bs)
+    void InitUARecd(const String& aName, unsigned long off_, 
+        std::vector<byte> bs, bool bEnable)
     {
         offset = off_;
         udName = aName;
         usBytes = bs;
+        bEnableWhenStart = bEnable;
         //获取该偏移处 usBytes.size() 个原始值
         oldBytes = cczAssistLibLoader::getInstance()->GetCczMemory(
             offset, usBytes.size());
 
         chkbx_Name.setButtonText(udName);
+        chkbx_Name.setToggleState(bEnableWhenStart, dontSendNotification);
     }
 
     void SetToCczMem()
@@ -98,12 +105,28 @@ public:
         {
             RestoreCczMem();
         }
+        if (btnThatClicked == &chkbx_Name)
+        {
+            cczAssistAppConfig::getInstance()->
+                setUserAddItemAutoEnabled(udName, chkbx_Name.getToggleState());
+        }
+    }
+
+    void UnSelectAll(bool bToggle)
+    {
+        chkbx_Name.setToggleState(bToggle, sendNotification);
+    }
+
+    bool isChecked()
+    {
+        return chkbx_Name.getToggleState();
     }
 
 private:
     ToggleButton      chkbx_Name;
     TextButton        btn_Apply;
     TextButton        btn_Restore;
+    bool              bEnableWhenStart;
     String            udName;     //user defined name
     unsigned long     offset;
     std::vector<byte> usBytes;    // usser set bytes
@@ -129,7 +152,8 @@ public:
             {
                 AddUserModifyRecord(itms[i].getDynamicObject()->getProperty("Name"),
                     itms[i].getDynamicObject()->getProperty("Offset"),
-                    itms[i].getDynamicObject()->getProperty("Bytes"));
+                    itms[i].getDynamicObject()->getProperty("Bytes"),
+                    itms[i].getDynamicObject()->getProperty("AutoEnable"));
             }
         }
         Set_Comp_Size(this, "UL_Rcd_ViewPort_Main_Rect");
@@ -175,13 +199,36 @@ public:
 
 public:
     void AddUserModifyRecord(const String& name, 
-        const String& offset, const String& val)
+        const String& offset, const String& val, bool bEnable)
     {
         std::shared_ptr<UserRecordApplyComp> ura = 
             std::shared_ptr<UserRecordApplyComp>(new UserRecordApplyComp());
-        ura->InitUARecd(name, convertinputtoulong(offset), convertinputbytes(val.trim()));
+        ura->InitUARecd(name, convertinputtoulong(offset), convertinputbytes(val.trim()), bEnable);
         addAndMakeVisible(ura.get());
         recds.push_back(ura);
+        cczAssistAppConfig::getInstance()->
+            setUserAddItem(name, offset, val.trim(), bEnable);
+    }
+
+    void UnSelectAll(bool bToggle)
+    {
+        for (std::vector<std::shared_ptr<UserRecordApplyComp> >::iterator
+            itRcd = recds.begin(); itRcd != recds.end(); ++ itRcd)
+        {
+            (*itRcd)->UnSelectAll(bToggle);
+        }
+    }
+
+    void ApplyAllSelected()
+    {
+        for (std::vector<std::shared_ptr<UserRecordApplyComp> >::iterator
+            itRcd = recds.begin(); itRcd != recds.end(); ++ itRcd)
+        {
+            if ((*itRcd)->isChecked())
+            {
+                (*itRcd)->SetToCczMem();
+            }
+        }
     }
 
 private:

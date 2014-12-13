@@ -103,13 +103,16 @@ MainContentComponent::MainContentComponent()
     usrRecdViewport.setViewedComponent(&usrRecdComp, false);
     chkbx_RecdSelAll.setButtonText(cczAssistLanguageSetting::getInstance()->
         getUIText("cczAssistMain_Text_SelectAll"));
+    chkbx_RecdSelAll.addListener(this);
     UILayoutConverter::Set_Comp_Size(&chkbx_RecdSelAll, "UL_Chkbx_RecdSelAll_Rect");
     btn_SaveAutoApply.setButtonText(cczAssistLanguageSetting::getInstance()->
         getUIText("cczAssistMain_Text_Save"));
     UILayoutConverter::Set_Comp_Size(&btn_SaveAutoApply, "UL_Btn_SavAutoApply_Rect");
+    btn_SaveAutoApply.addListener(this);
     btn_ApplyAllRecd.setButtonText(cczAssistLanguageSetting::getInstance()->
         getUIText("cczAssistMain_Text_Apply"));
     UILayoutConverter::Set_Comp_Size(&btn_ApplyAllRecd, "UL_Btn_ApplyAllRecd_Rect");
+    btn_ApplyAllRecd.addListener(this);
 
     addAndMakeVisible(lbl_Path_ccz);
     addAndMakeVisible(edt_Path_ccz);
@@ -207,6 +210,7 @@ void MainContentComponent::buttonClicked(Button* btnThatClicked)
             {
                 cczAssistLibLoader::getInstance()->SetTimeSpeed(timespeed_Slider.getValue());
             }
+            usrRecdComp.ApplyAllSelected();
         }
     }
     else if (btnThatClicked == &btn_SetMem)
@@ -233,11 +237,11 @@ void MainContentComponent::buttonClicked(Button* btnThatClicked)
     }
     else if (btnThatClicked == &btn_SaveRecd)
     {
-        cczAssistAppConfig::getInstance()->setUserAddItem(
+        usrRecdComp.AddUserModifyRecord(
             edt_SaveRecName.getText(),
             edt_Offset.getText(),
-            edt_NewBytes.getText()
-            );
+            edt_NewBytes.getText(), false);
+        usrRecdComp.resized();
     }
     else if (btnThatClicked == &chkbx_AutoClk)
     {
@@ -248,6 +252,18 @@ void MainContentComponent::buttonClicked(Button* btnThatClicked)
         bool checked = chkbx_SaveRecd.getToggleState();
         edt_SaveRecName.setEnabled(checked);
         btn_SaveRecd.setEnabled(checked);
+    }
+    else if (btnThatClicked == &chkbx_RecdSelAll)
+    {
+        usrRecdComp.UnSelectAll(chkbx_RecdSelAll.getToggleState());
+    }
+    else if (btnThatClicked == &btn_ApplyAllRecd)
+    {
+        usrRecdComp.ApplyAllSelected();
+    }
+    else if (btnThatClicked == &btn_SaveAutoApply)
+    {
+        cczAssistAppConfig::getInstance()->saveConfig();
     }
 }
 

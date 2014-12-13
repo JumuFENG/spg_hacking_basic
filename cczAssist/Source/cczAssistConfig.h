@@ -86,12 +86,17 @@ public:
 
     ~cczAssistAppConfig()
     {
-        varAppConfig.getDynamicObject()->setProperty("UserAdded", varUserAddedItems);
-        fappcofig.replaceWithText(JSON::toString(varAppConfig));
+        saveConfig();
     }
 
     juce_DeclareSingleton(cczAssistAppConfig, false);
 public:
+    void saveConfig()
+    {
+        varAppConfig.getDynamicObject()->setProperty("UserAdded", varUserAddedItems);
+        fappcofig.replaceWithText(JSON::toString(varAppConfig));
+    }
+
     bool getAutoSendClick()
     {
         return getConfigBool(String("AppSetting_AutoClick"));
@@ -127,7 +132,7 @@ public:
         varAppConfig.getDynamicObject()->setProperty("AppSetting_TimeSpeed", aR);
     }
 
-    void setUserAddItem(const String& n, const String& offset, const String& val)
+    void setUserAddItem(const String& n, const String& offset, const String& val, bool bEnable = false)
     {
         bool bFound = false;
         if (varUserAddedItems.isArray())
@@ -140,6 +145,7 @@ public:
                     bFound = true;
                     dobj->setProperty("Offset", offset);
                     dobj->setProperty("Bytes", val);
+                    dobj->setProperty("AutoEnable", bEnable);
                     break;
                 }
             }
@@ -150,7 +156,24 @@ public:
             varItem.getDynamicObject()->setProperty("Name", n);
             varItem.getDynamicObject()->setProperty("Offset", offset);
             varItem.getDynamicObject()->setProperty("Bytes", val);
+            varItem.getDynamicObject()->setProperty("AutoEnable", bEnable);
             varUserAddedItems.append(varItem);
+        }
+    }
+
+    void setUserAddItemAutoEnabled(const String& n, bool bEnable = true)
+    {
+        if (varUserAddedItems.isArray())
+        {
+            for (int i = 0; i < varUserAddedItems.size(); ++i)
+            {
+                DynamicObject* dobj = varUserAddedItems[i].getDynamicObject();
+                if (dobj->getProperty("Name") == n)
+                {
+                    dobj->setProperty("AutoEnable", bEnable);
+                    break;
+                }
+            }
         }
     }
 
