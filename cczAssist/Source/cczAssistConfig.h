@@ -182,6 +182,22 @@ public:
         return varUserAddedItems;
     }
 
+    void deleteUserAddedByName(const String& n)
+    {
+        if (varUserAddedItems.isArray())
+        {
+            for (int i = 0; i < varUserAddedItems.size(); ++i)
+            {
+                DynamicObject* dobj = varUserAddedItems[i].getDynamicObject();
+                if (dobj->getProperty("Name") == n)
+                {
+                    varUserAddedItems.remove(i);
+                    break;
+                }
+            }
+        }
+    }
+
 private:
     String getConfigStr(const String& cfgId)
     {

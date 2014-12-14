@@ -30,6 +30,7 @@ class UserRecordApplyComp
 {
 public:
     UserRecordApplyComp()
+        : bDeleted(false)
     {
         Set_Comp_Size(&chkbx_Name, "UL_Rcd_NameChkbx_Rect");
         Set_Comp_Size(&btn_Apply, "UL_Rcd_Applybtn_Rect");
@@ -103,7 +104,10 @@ public:
     {
         if (mevt.mods.isRightButtonDown() && mevt.eventComponent == &chkbx_Name)
         {
-            
+            PopupMenu pm;
+            pm.addItem(POP_Delete, cczAssistLanguageSetting::getInstance()->getUIText(
+                String("cczAssistMain_Text_Delete")), true);
+            popupMenuClicked(pm.show());
         }
         else if (mevt.eventComponent == &btn_Apply)
         {
@@ -137,6 +141,19 @@ public:
         }
     }
 
+    void popupMenuClicked(int popId)
+    {
+        switch (popId)
+        {
+        case POP_Delete:
+            cczAssistAppConfig::getInstance()->deleteUserAddedByName(udName);
+            bDeleted = true;
+            setSize(0, 0);
+            getParentComponent()->resized();
+            break;
+        }
+    }
+
     void UnSelectAll(bool bToggle)
     {
         chkbx_Name.setToggleState(bToggle, sendNotification);
@@ -145,6 +162,11 @@ public:
     bool isChecked()
     {
         return chkbx_Name.getToggleState();
+    }
+
+    bool isDeleted()
+    {
+        return bDeleted;
     }
 
 private:
@@ -156,6 +178,10 @@ private:
     unsigned long     offset;
     std::vector<byte> usBytes;    // usser set bytes
     std::vector<byte> oldBytes;
+    bool              bDeleted;
+
+private:
+    enum { POP_Delete = 1};
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (UserRecordApplyComp)
@@ -213,8 +239,11 @@ public:
         for (std::vector<std::shared_ptr<UserRecordApplyComp> >::iterator 
             itRecd = recds.begin(); itRecd != recds.end(); ++itRecd)
         {
-            (*itRecd)->setBounds(x, y + deltaY, wd, ht);
-            deltaY += ht;
+            if (!(*itRecd)->isDeleted())
+            {
+                (*itRecd)->setBounds(x, y + deltaY, wd, ht);
+                deltaY += ht;
+            }
         }
         if (deltaY > getHeight())
         {
