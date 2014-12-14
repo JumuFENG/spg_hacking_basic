@@ -26,7 +26,7 @@ using UILayoutConverter::Set_Comp_Size;
 */
 class UserRecordApplyComp 
     : public Component
-    , public ButtonListener
+    , public MouseListener
 {
 public:
     UserRecordApplyComp()
@@ -35,13 +35,12 @@ public:
         Set_Comp_Size(&btn_Apply, "UL_Rcd_Applybtn_Rect");
         Set_Comp_Size(&btn_Restore, "UL_Rcd_Restorebtn_Rect");
 
+        chkbx_Name.setClickingTogglesState(false);
         addAndMakeVisible(chkbx_Name);
         addAndMakeVisible(btn_Apply);
         addAndMakeVisible(btn_Restore);
 
-        chkbx_Name.addListener(this);
-        btn_Apply.addListener(this);
-        btn_Restore.addListener(this);
+        addMouseListener(this, true);
     }
     ~UserRecordApplyComp(){}
     
@@ -100,6 +99,26 @@ public:
             String("cczAssistMain_Text_Restore")));
     }
 
+    void mouseUp (const MouseEvent& mevt)
+    {
+        if (mevt.mods.isRightButtonDown() && mevt.eventComponent == &chkbx_Name)
+        {
+            
+        }
+        else if (mevt.eventComponent == &btn_Apply)
+        {
+            buttonClicked(&btn_Apply);
+        }
+        else if (mevt.eventComponent == &btn_Restore)
+        {
+            buttonClicked(&btn_Restore);
+        }
+        else if (mevt.eventComponent == &chkbx_Name)
+        {
+            buttonClicked(&chkbx_Name);
+        }
+    }
+
     void buttonClicked(Button* btnThatClicked)
     {
         if (btnThatClicked == &btn_Apply)
@@ -112,6 +131,7 @@ public:
         }
         if (btnThatClicked == &chkbx_Name)
         {
+            chkbx_Name.setToggleState(!chkbx_Name.getToggleState(), dontSendNotification);
             cczAssistAppConfig::getInstance()->
                 setUserAddItemAutoEnabled(udName, chkbx_Name.getToggleState());
         }
