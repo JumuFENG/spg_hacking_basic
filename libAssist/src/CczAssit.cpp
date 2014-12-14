@@ -403,25 +403,44 @@ void CCZAssitWrapper::writetoccz(unsigned long offset, const byte* data, size_t 
     mdo_Mod_MemProc mdo_mod_mem = (mdo_Mod_MemProc)GetProcAddress(hMemDO, "mdo_modify_memory");
     if (mdo_mod_mem != NULL)
     {
-        mdo_mod_mem(tstring(_T("Ekd5.exe")), offset, data, len);
-        LOG("Write memory done!");
+        if (0 != mdo_mod_mem(tstring(_T("Ekd5.exe")), offset, data, len))
+        {
+            LOG("Write memory Error!");
+        }
     }
 }
 
-void CCZAssitWrapper::readfromccz(unsigned long offset, const byte* data, size_t len)
+void CCZAssitWrapper::readfromccz(unsigned long offset, const byte* data, size_t& len)
 {
-    CHECK_NULL_HANDLE(cczProcInfo.hProcess, "CCZ is not running!");
+    size_t tLen = len;
+    len = 0;
+    CHECK_NULL_HANDLE(cczProcInfo.hProcess, "CCZ is not running!")
+
     if (!check_hMemDO())
     {
         LOG("libMemDO doesn't loaded!");
         return;
     }
-    typedef int(*mdo_Mod_GetMemProc)(const tstring&, unsigned long, const byte*, size_t);
-    mdo_Mod_GetMemProc mdo_mod_getmem = (mdo_Mod_GetMemProc)GetProcAddress(hMemDO, "mdo_modify_memory");
+    if (!bgetDbgPriv)
+    {
+        if (!enableDebugPrivilege())
+        {
+            LOG("EnableDebugPrivilege Failed!");
+            LOG(GetLastError());
+            return;
+        }
+    }
+    typedef int(*mdo_Mod_GetMemProc)(const tstring&, unsigned long, const byte*, size_t&);
+    mdo_Mod_GetMemProc mdo_mod_getmem = (mdo_Mod_GetMemProc)GetProcAddress(hMemDO, "mdo_get_memory");
     if (mdo_mod_getmem != NULL)
     {
-        mdo_mod_getmem(tstring(_T("Ekd5.exe")), offset, data, len);
-        LOG("Read memory done!");
+        if (0 != mdo_mod_getmem(tstring(_T("Ekd5.exe")), offset, data, tLen))
+        {
+            LOG("Read memory Error!");
+            return;
+        }
+        len = tLen;
+        return;
     }
 }
 

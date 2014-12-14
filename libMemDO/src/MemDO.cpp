@@ -45,21 +45,22 @@ int mdo_get_memory(const tstring& strProcName, unsigned long offset,
         PROCESS_VM_WRITE, FALSE, dwPid);
     if (hTargetProc == NULL)
     {
-        LOG("OpenProcess failed!");
-        LOG(GetLastError());
+        LOG("OpenProcess failed!", GetLastError());
+        LOG("Pid: ", dwPid);
         return 1;
     }
+
     SIZE_T szRead;
     if ( !ReadProcessMemory(hTargetProc, 
         (LPVOID)realAddress, (LPVOID)content, nsize, &szRead))
     {
         CloseHandle(hTargetProc);
-        LOG("WriteProcessMemory failed!");
+        LOG("ReadProcessMemory failed!");
         LOG(GetLastError());
         return GetLastError();
     }
     nsize = szRead;
-    LOG("WriteProcessMemory OK!");
+    LOG("ReadProcessMemory OK!");
     CloseHandle(hTargetProc);
     return 0;
 }

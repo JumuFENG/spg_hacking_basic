@@ -64,6 +64,11 @@ public:
     {
         if (!usBytes.empty())
         {
+            if (oldBytes.empty())
+            {
+                oldBytes = cczAssistLibLoader::getInstance()->GetCczMemory(
+                    offset, usBytes.size());
+            }
             cczAssistLibLoader::getInstance()->SetCczMemory(offset, 
                 (byte*)&usBytes[0], usBytes.size());
         }
