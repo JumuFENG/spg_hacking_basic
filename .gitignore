@@ -36,6 +36,7 @@
 /3rd_party/utils_win
 /3rd_party/mhook
 /output
+/cczAssist/JuceLibraryCode/modules
 Debug
 Release
 /cczAssist/Builds/VisualStudio2010/settings/appconfig.json

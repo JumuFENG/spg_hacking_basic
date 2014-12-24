@@ -24,7 +24,7 @@ public:
     MainContentComponent()
     {
         spTc = new TabbedComponent(TabbedButtonBar::TabsAtTop);
-        spTc->addTab("Main", Colour(0xffeeddff), new MainTabComponent(), false);
+        spTc->addTab("Main", Colour(0xffeeddff), new TextButton("hello"), false);
         //spTc->addTab("Second", Colour(0xffeeddff), tbtn, false);
         addAndMakeVisible(spTc);
         UILayoutConverter::Set_Comp_Size(this, "UL_MainWindow_Rect");

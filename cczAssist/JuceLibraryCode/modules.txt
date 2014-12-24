@@ -1,0 +1,2 @@
+modules是JUCE根目录下的moduels文件夹，可以在git上下载：https://github.com/julianstorer/JUCE.git或者git@github.com:julianstorer/JUCE.git 。在本项目中不做同步。
+modules is the modules folder in the root of JUCE, it can be cloned from git: https://github.com/julianstorer/JUCE.git or git@github.com:julianstorer/JUCE.git . I will ignore it in this project.
