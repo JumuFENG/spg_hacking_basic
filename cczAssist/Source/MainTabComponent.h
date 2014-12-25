@@ -29,6 +29,11 @@ namespace UILayoutConverter{
         juce::Rectangle<int> sz = cczAssistUILayout::getInstance()->GetUILayout(s);
         c->setSize(sz.getWidth(), sz.getHeight());//(55, 25);
     }
+
+    String Get_UI_Text(const String& t)
+    {
+        return cczAssistLanguageSetting::getInstance()->getUIText(t);
+    }
 }
 
 class MainTabComponent   : public Component

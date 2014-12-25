@@ -77,6 +77,7 @@ namespace InputStringConverter {
 namespace UILayoutConverter{
     inline void Set_Comp_Pos(Component* c, const String& p);
     inline void Set_Comp_Size(Component* c, const String& s);
+    inline String Get_UI_Text(const String& t);
 }
 
 #endif // CCZ_INPUTSTRING_CONVERTER_H

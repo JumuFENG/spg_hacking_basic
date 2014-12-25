@@ -1680,6 +1680,7 @@ del $(OutDir)settings\appconfig.json</Command>
     <ClInclude Include="..\..\Source\cczAssistConfig.h" />
     <ClInclude Include="..\..\Source\cczAssistLibLoader.h" />
     <ClInclude Include="..\..\Source\MainComponent.h" />
+    <ClInclude Include="..\..\Source\WCATabPageComp.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\JuceLibraryCode\modules\juce_audio_basics\juce_module_info" />

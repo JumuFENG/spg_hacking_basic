@@ -1,4 +1,7 @@
 ﻿{
+  "cczAssistMain_TabName_Main": "Main",
+  "cczAssistMain_TabName_WCA": "武具",
+
   "cczAssistMain_Label_Path": "路径:",
   "cczAssistMain_btn_Browse": "浏览&启动",
   "cczAssistMain_btn_Run": "启动",
@@ -15,5 +18,16 @@
   "cczAssistMain_Text_Restore":"恢复",
   "cczAssistMain_Text_SelectAll":"全选",
   "cczAssistMain_Text_Delete":"删除",
-  "cczAssistMain_Text_Save": "保存"
+  "cczAssistMain_Text_Save": "保存",
+
+  "cczWCA_Label_WCAName":"名称",
+  "cczWCA_Label_PicNum":"图标编号",
+  "cczWCA_Label_Price":"价格",
+  "cczWCA_Label_EffectName":"效果",
+  "cczWCA_Label_EffectVal":"效果值",
+  "cczWCA_Label_TypeName":"属性",
+  "cczWCA_Label_OriginVal":"初始值",
+  "cczWCA_Label_LvDelta":"升级成长",
+
+  "a":"b"
 }

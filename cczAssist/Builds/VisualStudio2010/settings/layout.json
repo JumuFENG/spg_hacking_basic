@@ -30,5 +30,15 @@
   "UL_Rcd_Applybtn_Rect": "118 1 40 21",
   "UL_Rcd_Restorebtn_Rect": "159 1 40 21",
 
+  "UL_WCA_lbl_WCAName": "130 50 50 25",
+  "UL_WCA_lbl_PicNum": "130 80 70 25",
+  "UL_WCA_lbl_Price": "130 110 70 25",
+  "UL_WCA_lbl_EffectName": "130 140 70 25",
+  "UL_WCA_lbl_EffectVal": "130 170 70 25",
+  "UL_WCA_lbl_TypeName": "130 200 70 25",
+  "UL_WCA_lbl_OriginVal": "130 230 70 25",
+  "UL_WCA_lbl_LvDelta": "130 260 70 25",
+
+
   "a":"b"
 }
