@@ -30,14 +30,24 @@
   "UL_Rcd_Applybtn_Rect": "118 1 40 21",
   "UL_Rcd_Restorebtn_Rect": "159 1 40 21",
 
-  "UL_WCA_lbl_WCAName": "130 50 50 25",
-  "UL_WCA_lbl_PicNum": "130 80 70 25",
+  "UL_WCA_lstbox_WCAMain": "3 3 120 360",
+  "UL_WCA_lbl_WCAName": "130 050 70 25",
+  "UL_WCA_lbl_PicNum": "130 080 70 25",
   "UL_WCA_lbl_Price": "130 110 70 25",
   "UL_WCA_lbl_EffectName": "130 140 70 25",
   "UL_WCA_lbl_EffectVal": "130 170 70 25",
   "UL_WCA_lbl_TypeName": "130 200 70 25",
   "UL_WCA_lbl_OriginVal": "130 230 70 25",
   "UL_WCA_lbl_LvDelta": "130 260 70 25",
+
+  "UL_WCA_lbl_WCANam_Val":"210 050 80 25",
+  "UL_WCA_lbl_PicNum_Val":"210 080 30 25",
+  "UL_WCA_lbl_Price__Val":"210 110 30 25",
+  "UL_WCA_lbl_EffectNVal":"210 140 130 25",
+  "UL_WCA_lbl_EffectVVal":"210 170 50 25",
+  "UL_WCA_lbl_TypeNamVal":"210 200 80 25",
+  "UL_WCA_lbl_OriginVVal":"210 230 30 25",
+  "UL_WCA_lbl_LvDelt_Val":"210 260 30 25",
 
 
   "a":"b"

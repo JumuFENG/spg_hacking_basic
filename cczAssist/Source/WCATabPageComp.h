@@ -19,6 +19,35 @@ namespace UILC = UILayoutConverter;
 using InputStringConverter::convertinputtoulong;
 using InputStringConverter::convertinputbytes;
 
+class WCAListModel : public ListBoxModel
+{
+public:
+    WCAListModel()
+    {
+
+    }
+
+    ~WCAListModel()
+    {
+
+    }
+
+    int getNumRows()
+    {
+        return 58;
+    }
+
+    void paintListBoxItem (int rowNumber,
+        Graphics& g,
+        int width, int height,
+        bool rowIsSelected)
+    {
+        g.drawText(String("Item") + String(rowNumber), juce::Rectangle<float>(1.0, 1.0, width, height),
+            Justification::centred, true);
+    }
+
+};
+
 class WCATabPageComp   : public Component
     , public ButtonListener
     , public TextEditorListener
@@ -27,15 +56,26 @@ public:
     //==============================================================================
     WCATabPageComp()
     {
+        lstWCA.setModel(&lstModel);
+        
         lbl_WCAName.setText(UILC::Get_UI_Text("cczWCA_Label_WCAName"), dontSendNotification);
+        lbl_WCAName.setJustificationType(Justification::centredRight);
         lbl_PicNum.setText(UILC::Get_UI_Text("cczWCA_Label_PicNum"), dontSendNotification);
+        lbl_PicNum.setJustificationType(Justification::centredRight);
         lbl_Price.setText(UILC::Get_UI_Text("cczWCA_Label_Price"), dontSendNotification);
+        lbl_Price.setJustificationType(Justification::centredRight);
         lbl_EffectName.setText(UILC::Get_UI_Text("cczWCA_Label_EffectName"), dontSendNotification);
+        lbl_EffectName.setJustificationType(Justification::centredRight);
         lbl_EffectVal.setText(UILC::Get_UI_Text("cczWCA_Label_EffectVal"), dontSendNotification);
+        lbl_EffectVal.setJustificationType(Justification::centredRight);
         lbl_TypeName.setText(UILC::Get_UI_Text("cczWCA_Label_TypeName"), dontSendNotification);
+        lbl_TypeName.setJustificationType(Justification::centredRight);
         lbl_OriginVal.setText(UILC::Get_UI_Text("cczWCA_Label_OriginVal"), dontSendNotification);
+        lbl_OriginVal.setJustificationType(Justification::centredRight);
         lbl_LvDelta.setText(UILC::Get_UI_Text("cczWCA_Label_LvDelta"), dontSendNotification);
+        lbl_LvDelta.setJustificationType(Justification::centredRight);
 
+        UILC::Set_Comp_Size(&lstWCA, "UL_WCA_lstbox_WCAMain");
         UILC::Set_Comp_Size(&lbl_WCAName, "UL_WCA_lbl_WCAName");
         UILC::Set_Comp_Size(&lbl_PicNum, "UL_WCA_lbl_PicNum");
         UILC::Set_Comp_Size(&lbl_Price, "UL_WCA_lbl_Price");
@@ -45,6 +85,31 @@ public:
         UILC::Set_Comp_Size(&lbl_OriginVal, "UL_WCA_lbl_OriginVal");
         UILC::Set_Comp_Size(&lbl_LvDelta, "UL_WCA_lbl_LvDelta");
 
+        lbl_WCANam_Val.setText(L"青龙偃月刀", dontSendNotification);
+        lbl_PicNum_Val.setText("25", dontSendNotification);
+        lbl_Price__Val.setText("255", dontSendNotification);
+        lbl_Price__Val.setEditable(true);
+//         combo_EffectNVal.setText(L"每回合获得武器Exp", dontSendNotification);
+        combo_EffectNVal.addItem(L"每回合获得武器Exp", -1);
+//         combo_EffectVVal.setText("100", dontSendNotification);
+        combo_EffectVVal.addItem("30", -1);
+//         combo_TypeNamVal.setText(L"炮车(Lv9)", dontSendNotification);
+        combo_TypeNamVal.addItem(L"炮车(Lv9)", -1);
+        lbl_OriginVVal.setText("100", dontSendNotification);
+        lbl_OriginVVal.setEditable(true);
+        lbl_LvDelt_Val.setText("100", dontSendNotification);
+        lbl_LvDelt_Val.setEditable(true);
+
+        UILC::Set_Comp_Size(&lbl_WCANam_Val, "UL_WCA_lbl_WCANam_Val");
+        UILC::Set_Comp_Size(&lbl_PicNum_Val, "UL_WCA_lbl_PicNum_Val");
+        UILC::Set_Comp_Size(&lbl_Price__Val, "UL_WCA_lbl_Price__Val");
+        UILC::Set_Comp_Size(&combo_EffectNVal, "UL_WCA_lbl_EffectNVal");
+        UILC::Set_Comp_Size(&combo_EffectVVal, "UL_WCA_lbl_EffectVVal");
+        UILC::Set_Comp_Size(&combo_TypeNamVal, "UL_WCA_lbl_TypeNamVal");
+        UILC::Set_Comp_Size(&lbl_OriginVVal, "UL_WCA_lbl_OriginVVal");
+        UILC::Set_Comp_Size(&lbl_LvDelt_Val, "UL_WCA_lbl_LvDelt_Val");
+
+        addAndMakeVisible(lstWCA);
         addAndMakeVisible(lbl_WCAName);
         addAndMakeVisible(lbl_PicNum);
         addAndMakeVisible(lbl_Price);
@@ -53,6 +118,15 @@ public:
         addAndMakeVisible(lbl_TypeName);
         addAndMakeVisible(lbl_OriginVal);
         addAndMakeVisible(lbl_LvDelta);
+
+        addAndMakeVisible(lbl_WCANam_Val);
+        addAndMakeVisible(lbl_PicNum_Val);
+        addAndMakeVisible(lbl_Price__Val);
+        addAndMakeVisible(combo_EffectNVal);
+        addAndMakeVisible(combo_EffectVVal);
+        addAndMakeVisible(combo_TypeNamVal);
+        addAndMakeVisible(lbl_OriginVVal);
+        addAndMakeVisible(lbl_LvDelt_Val);
     }
 
     ~WCATabPageComp()
@@ -72,6 +146,7 @@ public:
         // This is called when the MainContentComponent is resized.
         // If you add any child components, this is where you should
         // update their positions.
+        UILC::Set_Comp_Pos(&lstWCA, "UL_WCA_lstbox_WCAMain");
         UILC::Set_Comp_Pos(&lbl_WCAName, "UL_WCA_lbl_WCAName");
         UILC::Set_Comp_Pos(&lbl_PicNum,"UL_WCA_lbl_PicNum");
         UILC::Set_Comp_Pos(&lbl_Price, "UL_WCA_lbl_Price");
@@ -80,7 +155,16 @@ public:
         UILC::Set_Comp_Pos(&lbl_TypeName, "UL_WCA_lbl_TypeName");
         UILC::Set_Comp_Pos(&lbl_OriginVal, "UL_WCA_lbl_OriginVal");
         UILC::Set_Comp_Pos(&lbl_LvDelta, "UL_WCA_lbl_LvDelta");
-   }
+
+        UILC::Set_Comp_Pos(&lbl_WCANam_Val, "UL_WCA_lbl_WCANam_Val");
+        UILC::Set_Comp_Pos(&lbl_PicNum_Val, "UL_WCA_lbl_PicNum_Val");
+        UILC::Set_Comp_Pos(&lbl_Price__Val, "UL_WCA_lbl_Price__Val");
+        UILC::Set_Comp_Pos(&combo_EffectNVal, "UL_WCA_lbl_EffectNVal");
+        UILC::Set_Comp_Pos(&combo_EffectVVal, "UL_WCA_lbl_EffectVVal");
+        UILC::Set_Comp_Pos(&combo_TypeNamVal, "UL_WCA_lbl_TypeNamVal");
+        UILC::Set_Comp_Pos(&lbl_OriginVVal, "UL_WCA_lbl_OriginVVal");
+        UILC::Set_Comp_Pos(&lbl_LvDelt_Val, "UL_WCA_lbl_LvDelt_Val");
+    }
 
     void buttonClicked(Button* btnThatClicked)
     {
@@ -92,6 +176,9 @@ public:
     }
 
 private:
+    ListBox      lstWCA;
+    WCAListModel lstModel;
+
     Label       lbl_WCAName;
     Label       lbl_PicNum;
     Label       lbl_Price;
@@ -100,6 +187,15 @@ private:
     Label       lbl_TypeName;
     Label       lbl_OriginVal;
     Label       lbl_LvDelta;
+
+    Label       lbl_WCANam_Val;
+    Label       lbl_PicNum_Val;
+    Label       lbl_Price__Val;
+    ComboBox    combo_EffectNVal;
+    ComboBox    combo_EffectVVal;
+    ComboBox    combo_TypeNamVal;
+    Label       lbl_OriginVVal;
+    Label       lbl_LvDelt_Val;
 
 private:
     //==============================================================================
