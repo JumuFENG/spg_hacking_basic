@@ -13,6 +13,11 @@
 #include "libAssist/src/CczAssit.h"
 #include "libAssist/src/CczDataStructs.h"
 
+#ifndef LOG
+#define LOG(x) Logger::writeToLog(String(__FILE__) + " [" + \
+    String(__LINE__) + "] " + String((x)));
+#endif
+
 class cczAssistLibLoader
 {
 public:
@@ -105,20 +110,33 @@ public:
         }
     }
 
-    std::vector<ItemDetail> GetCczItems()
+    std::vector<ItemDetail> GetCczItems(bool bRepeatForGetData = false)
     {
         std::vector<ItemDetail> allItems;
         int itemNum = 104;
         unsigned long itemOffset = 0xA1140;
         size_t rsize = itemNum * sizeof(ItemDetail);
-        std::vector<byte> itemMem = GetCczMemory(itemOffset, rsize);
-        if (!itemMem.empty())
+        std::vector<byte> itemMem;
+        int maxRepeat = 1000;
+        bool getFaultData = true;
+        do 
+        {
+            itemMem = GetCczMemory(itemOffset, rsize);
+            Sleep(1000);
+            getFaultData = (itemMem.empty() || itemMem[0] == 0);
+        } while (getFaultData && bRepeatForGetData && maxRepeat--);
+
+        if (!getFaultData)
         {
             PItemDetail pItems = (PItemDetail)&itemMem[0];
             for (int i = 0; i < itemNum; ++i, pItems ++)
             {
                 allItems.push_back(*pItems);
             }
+        }
+        else
+        {
+            LOG("Get Mem failed!");
         }
         return allItems;
     }

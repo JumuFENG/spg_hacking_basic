@@ -72,7 +72,8 @@ namespace InputStringConverter {
         return vecbyte;
     }
 
-    String inline ConvertGBKToUtf8Str(std::vector<char> strGBK) {
+    String inline ConvertGBKToUtf8Str(std::vector<char> strGBK)
+    {
         if (strGBK.empty())
         {
             return String::empty;
@@ -91,6 +92,16 @@ namespace InputStringConverter {
         delete[] szUtf8;
         delete[] wszUtf8;
         return rlt;
+    }
+
+    String inline ConvertGBKToUtf8Str(char* pCh, int len)
+    {
+        std::vector<char> vecGbk;
+        for (int i = 0; i < len; ++i)
+        {
+            vecGbk.push_back(pCh[i]);
+        }
+        return ConvertGBKToUtf8Str(vecGbk);
     }
 
     std::vector<char> inline ConvertStringToGBK(const String& strUtf8) {

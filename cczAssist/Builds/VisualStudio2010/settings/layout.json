@@ -42,7 +42,7 @@
 
   "UL_WCA_lbl_WCANam_Val":"210 050 80 25",
   "UL_WCA_lbl_PicNum_Val":"210 080 30 25",
-  "UL_WCA_lbl_Price__Val":"210 110 30 25",
+  "UL_WCA_lbl_Price__Val":"210 110 60 25",
   "UL_WCA_lbl_EffectNVal":"210 140 130 25",
   "UL_WCA_lbl_EffectVVal":"210 170 50 25",
   "UL_WCA_lbl_TypeNamVal":"210 200 80 25",

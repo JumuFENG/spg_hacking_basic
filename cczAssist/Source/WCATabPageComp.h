@@ -19,11 +19,19 @@ namespace UILC = UILayoutConverter;
 using InputStringConverter::convertinputtoulong;
 using InputStringConverter::convertinputbytes;
 
+class WCAListListener{
+public:
+    virtual ~WCAListListener()  {}
+    virtual void onSelectedRowChanged(int rowSelected) = 0;
+
+};
+
 class WCAListModel : public ListBoxModel
     , public Component
 {
 public:
     WCAListModel()
+        : listener(nullptr)
     {
 
     }
@@ -35,26 +43,29 @@ public:
 
     void initListData()
     {
-        getItems();
+        getItems(true);
     }
 
     int getNumRows()
     {
         if (items.empty())
         {
-            getItems();
+            getItems(false);
         }
         return items.size();
     }
 
-    void selectedRowsChanged(int lastRowSelected)
+    ItemDetail getItemDetail(int rowNum)
     {
-        Logger::writeToLog(String(lastRowSelected));
+        return items.at(rowNum);
     }
 
-    void listBoxItemClicked (int row, const MouseEvent&)
+    void selectedRowsChanged(int lastRowSelected)
     {
-        
+        if (nullptr != listener)
+        {
+            listener->onSelectedRowChanged(lastRowSelected);
+        }
     }
 
     void paintListBoxItem (int rowNumber,
@@ -77,27 +88,36 @@ public:
         
     }
 
-private:
-    void getItems()
+    void setListListener(WCAListListener* wcaLln)
     {
-        items = cczAssistLibLoader::getInstance()->GetCczItems();
+        listener = wcaLln;
     }
 
 private:
+    void getItems(bool bRepeat = false)
+    {
+        items = cczAssistLibLoader::getInstance()->GetCczItems(bRepeat);
+    }
+
+private:
+    WCAListListener*        listener;
     std::vector<ItemDetail> items;
 };
 
 class WCATabPageComp   : public Component
     , public ButtonListener
     , public TextEditorListener
+    , public WCAListListener
     , public ChangeListener
 {
 public:
     //==============================================================================
     WCATabPageComp()
     {
+        lstModel.setListListener(this);
         lstWCA.setModel(&lstModel);
         lstWCA.setMultipleSelectionEnabled(false);
+        lstWCA.selectRow(0);
         
         lbl_WCAName.setText(UILC::Get_UI_Text("cczWCA_Label_WCAName"), dontSendNotification);
         lbl_WCAName.setJustificationType(Justification::centredRight);
@@ -126,16 +146,21 @@ public:
         UILC::Set_Comp_Size(&lbl_OriginVal, "UL_WCA_lbl_OriginVal");
         UILC::Set_Comp_Size(&lbl_LvDelta, "UL_WCA_lbl_LvDelta");
 
-        lbl_WCANam_Val.setText(L"青龙偃月刀", dontSendNotification);
-        lbl_PicNum_Val.setText("25", dontSendNotification);
-        lbl_Price__Val.setText("255", dontSendNotification);
         lbl_Price__Val.setEditable(true);
-//         combo_EffectNVal.setText(L"每回合获得武器Exp", dontSendNotification);
-        combo_EffectNVal.addItem(L"每回合获得武器Exp", -1);
+        StringArray st;
+        for (int i = 0; i < 78; ++i)
+        {
+            st.add(String(kItemProperName[i].c_str()));
+        }
+        combo_EffectNVal.addItemList(st, 1);
 //         combo_EffectVVal.setText("100", dontSendNotification);
-        combo_EffectVVal.addItem("30", -1);
-//         combo_TypeNamVal.setText(L"炮车(Lv9)", dontSendNotification);
-        combo_TypeNamVal.addItem(L"炮车(Lv9)", -1);
+        //combo_EffectVVal.addItem("30", -1);
+        StringArray stType;
+        for (int i = 0; i < 18; ++i)
+        {
+            stType.add(String(kItemProperName[i].c_str()));
+        }
+        combo_TypeNamVal.addItemList(stType, 1);
         lbl_OriginVVal.setText("100", dontSendNotification);
         lbl_OriginVVal.setEditable(true);
         lbl_LvDelt_Val.setText("100", dontSendNotification);
@@ -210,7 +235,10 @@ public:
     void initData()
     {
         lstModel.initListData();
+        int lstSelect = lstWCA.getSelectedRow();
         lstWCA.updateContent();
+        lstWCA.selectRow(lstSelect);
+        onSelectedRowChanged(lstSelect);
     }
 
     void buttonClicked(Button* btnThatClicked)
@@ -222,13 +250,59 @@ public:
 
     }
 
+    void onSelectedRowChanged(int rowSelected)
+    {
+        if (rowSelected < 0 || rowSelected >= lstModel.getNumRows())
+        {
+            LOG(String("Wrong selected Row id: ") + String(rowSelected));
+            return;
+        }
+        ItemDetail selItem = lstModel.getItemDetail(rowSelected);
+        lbl_WCANam_Val.setText(InputStringConverter::ConvertGBKToUtf8Str(selItem.szName, 
+            17), dontSendNotification);
+        lbl_PicNum_Val.setText(String(selItem.byIcon), dontSendNotification);
+        lbl_Price__Val.setText(selItem.byPrice == 255 ? 
+            UILC::Get_UI_Text("cczWCA_Text_NoPrice")
+            : String(selItem.byPrice * 100), dontSendNotification);
+        if (selItem.byType < 18)
+        {
+            // 武具
+            if (selItem.byType % 2 == 0)
+            {
+                combo_EffectNVal.setSelectedId(combo_EffectNVal.getNumItems());
+                combo_EffectVVal.setSelectedId(-1);
+                combo_EffectVVal.setEnabled(false);
+            }
+            else
+            {
+                combo_EffectNVal.setSelectedItemIndex(selItem.bySpEffect);
+                combo_EffectVVal.setSelectedItemIndex(selItem.bySpValue); // TODO:改为描述
+                combo_EffectVVal.setEnabled(true);
+            }
+            combo_TypeNamVal.setEnabled(true);
+            combo_TypeNamVal.setSelectedItemIndex(selItem.byType);
+            lbl_OriginVVal.setText(String(selItem.byLvOne), dontSendNotification);
+            lbl_LvDelt_Val.setText(String(selItem.byLvInc), dontSendNotification);
+        }
+        else
+        {
+            // 辅助
+            combo_EffectNVal.setSelectedItemIndex(selItem.byAstSpEff);
+            combo_EffectVVal.setSelectedItemIndex(selItem.byAstSpValue); // TODO:改为描述
+            combo_EffectVVal.setEnabled(true);
+            combo_TypeNamVal.setSelectedId(-1);
+            combo_TypeNamVal.setEnabled(false);
+            lbl_OriginVVal.setText(String::empty, dontSendNotification);
+            lbl_LvDelt_Val.setText(String::empty, dontSendNotification);
+        }
+    }
+
     void changeListenerCallback(ChangeBroadcaster* source)
     {
-        Logger::writeToLog("changeListenerCallback ");
         MainTabComponent* mainTab = (MainTabComponent*) source;
         if (mainTab->isCczRunning())
         {
-            Sleep(10000);
+            Sleep(3000);
             initData();
         }
     }
