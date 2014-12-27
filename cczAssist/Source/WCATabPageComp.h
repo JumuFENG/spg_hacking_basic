@@ -20,6 +20,7 @@ using InputStringConverter::convertinputtoulong;
 using InputStringConverter::convertinputbytes;
 
 class WCAListModel : public ListBoxModel
+    , public Component
 {
 public:
     WCAListModel()
@@ -32,9 +33,28 @@ public:
 
     }
 
+    void initListData()
+    {
+        getItems();
+    }
+
     int getNumRows()
     {
-        return 58;
+        if (items.empty())
+        {
+            getItems();
+        }
+        return items.size();
+    }
+
+    void selectedRowsChanged(int lastRowSelected)
+    {
+        Logger::writeToLog(String(lastRowSelected));
+    }
+
+    void listBoxItemClicked (int row, const MouseEvent&)
+    {
+        
     }
 
     void paintListBoxItem (int rowNumber,
@@ -42,21 +62,42 @@ public:
         int width, int height,
         bool rowIsSelected)
     {
-        g.drawText(String("Item") + String(rowNumber), juce::Rectangle<float>(1.0, 1.0, width, height),
-            Justification::centred, true);
+        if (rowIsSelected)
+            g.fillAll (findColour (TextEditor::highlightColourId));
+
+        ItemDetail id = items[rowNumber];
+        std::vector<char> szName;
+        for (int i = 0; i < 17; ++i)
+        {
+            szName.push_back(id.szName[i]);
+        }
+        g.drawText(InputStringConverter::ConvertGBKToUtf8Str(szName), 
+            juce::Rectangle<float>(1.0, 1.0, width, height),
+            Justification::centredLeft);
+        
     }
 
+private:
+    void getItems()
+    {
+        items = cczAssistLibLoader::getInstance()->GetCczItems();
+    }
+
+private:
+    std::vector<ItemDetail> items;
 };
 
 class WCATabPageComp   : public Component
     , public ButtonListener
     , public TextEditorListener
+    , public ChangeListener
 {
 public:
     //==============================================================================
     WCATabPageComp()
     {
         lstWCA.setModel(&lstModel);
+        lstWCA.setMultipleSelectionEnabled(false);
         
         lbl_WCAName.setText(UILC::Get_UI_Text("cczWCA_Label_WCAName"), dontSendNotification);
         lbl_WCAName.setJustificationType(Justification::centredRight);
@@ -166,6 +207,12 @@ public:
         UILC::Set_Comp_Pos(&lbl_LvDelt_Val, "UL_WCA_lbl_LvDelt_Val");
     }
 
+    void initData()
+    {
+        lstModel.initListData();
+        lstWCA.updateContent();
+    }
+
     void buttonClicked(Button* btnThatClicked)
     {
     }
@@ -173,6 +220,17 @@ public:
     void textEditorTextChanged (TextEditor& edt)
     {
 
+    }
+
+    void changeListenerCallback(ChangeBroadcaster* source)
+    {
+        Logger::writeToLog("changeListenerCallback ");
+        MainTabComponent* mainTab = (MainTabComponent*) source;
+        if (mainTab->isCczRunning())
+        {
+            Sleep(10000);
+            initData();
+        }
     }
 
 private:

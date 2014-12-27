@@ -26,8 +26,9 @@ public:
     MainContentComponent()
     {
         spTc = new TabbedComponent(TabbedButtonBar::TabsAtTop);
-        spTc->addTab(UILC::Get_UI_Text("cczAssistMain_TabName_Main"), Colour(0xffeeddff), new MainTabComponent(), false);
-        spTc->addTab(UILC::Get_UI_Text("cczAssistMain_TabName_WCA"), Colour(0xffeeddff), new WCATabPageComp(), false);
+        spTc->addTab(UILC::Get_UI_Text("cczAssistMain_TabName_Main"), Colour(0xffeeddff), &tabMain, false);
+        spTc->addTab(UILC::Get_UI_Text("cczAssistMain_TabName_WCA"), Colour(0xffeeddff), &tabWCA, false);
+        tabMain.addChangeListener(&tabWCA);
         spTc->setCurrentTabIndex(1);
         addAndMakeVisible(spTc);
         UILC::Set_Comp_Size(this, "UL_MainWindow_Rect");
@@ -49,6 +50,9 @@ public:
 
 private:
     SafePointer<TabbedComponent> spTc;
+    MainTabComponent             tabMain;
+    WCATabPageComp               tabWCA;
+
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MainContentComponent)
 };

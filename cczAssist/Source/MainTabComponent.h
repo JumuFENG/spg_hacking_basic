@@ -40,10 +40,11 @@ class MainTabComponent   : public Component
     , public ButtonListener
     , public TextEditorListener
     , public SliderListener
+    , public ChangeBroadcaster
 {
 public:
     //==============================================================================
-    MainTabComponent()
+    MainTabComponent() : bCczRunning(false)
     {
         //UILayoutConverter::Set_Comp_Size(this, "UL_MainWindow_Rect");
         //setSize(480, 200);
@@ -226,6 +227,8 @@ public:
                     cczAssistLibLoader::getInstance()->SetTimeSpeed(timespeed_Slider.getValue());
                 }
                 usrRecdComp.ApplyAllSelected();
+                bCczRunning = true;
+                sendChangeMessage();        // The Application started up
             }
         }
         else if (btnThatClicked == &btn_SetMem)
@@ -303,6 +306,12 @@ public:
             cczAssistAppConfig::getInstance()->setTimeSpeedRate(sldVal);
         }
     }
+
+public:
+    bool isCczRunning() {return bCczRunning;}
+
+private:
+    bool        bCczRunning;
 
 private:
     TextButton  btn_Exec;

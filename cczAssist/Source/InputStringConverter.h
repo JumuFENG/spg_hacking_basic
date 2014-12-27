@@ -72,6 +72,48 @@ namespace InputStringConverter {
         return vecbyte;
     }
 
+    String inline ConvertGBKToUtf8Str(std::vector<char> strGBK) {
+        if (strGBK.empty())
+        {
+            return String::empty;
+        }
+        int len=MultiByteToWideChar(CP_ACP, 0, (LPCTSTR)&strGBK[0], -1, NULL,0);
+        unsigned short * wszUtf8 = new unsigned short[len+1];
+        memset(wszUtf8, 0, len * 2 + 2);
+        MultiByteToWideChar(CP_ACP, 0, (LPCTSTR)&strGBK[0], -1, (LPWSTR)wszUtf8, len);
+
+        len = WideCharToMultiByte(CP_UTF8, 0, (LPWSTR)wszUtf8, -1, NULL, 0, NULL, NULL);
+        char *szUtf8=new char[len + 1];
+        memset(szUtf8, 0, len + 1);
+        WideCharToMultiByte (CP_UTF8, 0, (LPWSTR)wszUtf8, -1, szUtf8, len, NULL,NULL);
+
+        String rlt = String::fromUTF8(CharPointer_UTF8(szUtf8));
+        delete[] szUtf8;
+        delete[] wszUtf8;
+        return rlt;
+    }
+
+    std::vector<char> inline ConvertStringToGBK(const String& strUtf8) {
+        std::vector<char> rlt;
+        int len=MultiByteToWideChar(CP_UTF8, 0, (LPCTSTR)strUtf8.getCharPointer(), -1, NULL,0);
+        unsigned short * wszGBK = new unsigned short[len+1];
+        memset(wszGBK, 0, len * 2 + 2);
+        MultiByteToWideChar(CP_UTF8, 0, (LPCTSTR)strUtf8.getCharPointer(), -1, (LPWSTR)wszGBK, len);
+
+        len = WideCharToMultiByte(CP_ACP, 0, (LPWSTR)wszGBK, -1, NULL, 0, NULL, NULL);
+        char *szGBK=new char[len + 1];
+        memset(szGBK, 0, len + 1);
+        WideCharToMultiByte (CP_ACP, 0, (LPWSTR)wszGBK, -1, szGBK, len, NULL,NULL);
+
+        for (int i = 0; i < len + 1; ++i)
+        {
+            rlt.push_back(szGBK[i]);
+        }
+        delete[] szGBK;
+        delete[] wszGBK;
+        return rlt;
+    }
+
 }
 
 namespace UILayoutConverter{

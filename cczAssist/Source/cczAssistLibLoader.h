@@ -11,7 +11,8 @@
 
 #include "JuceHeader.h"
 #include "libAssist/src/CczAssit.h"
- 
+#include "libAssist/src/CczDataStructs.h"
+
 class cczAssistLibLoader
 {
 public:
@@ -102,6 +103,24 @@ public:
             float r = ar < 0.0f ? 1.0f / (1.0f - ar) : 1.0f + ar;
             caw->settimegear(r);
         }
+    }
+
+    std::vector<ItemDetail> GetCczItems()
+    {
+        std::vector<ItemDetail> allItems;
+        int itemNum = 104;
+        unsigned long itemOffset = 0xA1140;
+        size_t rsize = itemNum * sizeof(ItemDetail);
+        std::vector<byte> itemMem = GetCczMemory(itemOffset, rsize);
+        if (!itemMem.empty())
+        {
+            PItemDetail pItems = (PItemDetail)&itemMem[0];
+            for (int i = 0; i < itemNum; ++i, pItems ++)
+            {
+                allItems.push_back(*pItems);
+            }
+        }
+        return allItems;
     }
 
 private:
