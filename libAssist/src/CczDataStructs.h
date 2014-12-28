@@ -23,6 +23,14 @@ enum ItemProperty{
     Use_UpLv, Use_UpArmLv
 };
 
+const static int kItemNmTypeNum = 18;
+const static int kItemSpTypeNum = 45;
+const static int kItemUseTypeNum = 14;
+const static std::wstring kItemProperUnknown = L"无";
+
+const static unsigned long kItemsOffset = 0xA1140;
+const static int kItemsNum = 104;
+
 const std::wstring kItemProperName[] ={
     L"普通剑",
     L"特殊剑",
@@ -101,7 +109,6 @@ const std::wstring kItemProperName[] ={
     L"士气上升(整数)",
     L"等级上升",
     L"兵种上升",
-    L"(无)"
 };
 
 #pragma pack(1)

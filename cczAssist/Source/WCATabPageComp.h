@@ -60,6 +60,20 @@ public:
         return items.at(rowNum);
     }
 
+    void setModify(int rowNum, const ItemDetail& idtl )
+    {
+        if (rowNum >= items.size() || rowNum < 0)
+        {
+            LOG("Row Number Invalid!");
+            return;
+        }
+        if (itemsModified.size() < items.size())
+        {
+            itemsModified.resize(items.size());
+        }
+        itemsModified[rowNum] = idtl;
+    }
+
     void selectedRowsChanged(int lastRowSelected)
     {
         if (nullptr != listener)
@@ -102,9 +116,12 @@ private:
 private:
     WCAListListener*        listener;
     std::vector<ItemDetail> items;
+    std::vector<ItemDetail> itemsModified;
 };
 
 class WCATabPageComp   : public Component
+    , public LabelListener
+    , public ComboBoxListener
     , public ButtonListener
     , public TextEditorListener
     , public WCAListListener
@@ -146,25 +163,36 @@ public:
         UILC::Set_Comp_Size(&lbl_OriginVal, "UL_WCA_lbl_OriginVal");
         UILC::Set_Comp_Size(&lbl_LvDelta, "UL_WCA_lbl_LvDelta");
 
+        for (int i = 0; i < kItemNmTypeNum; ++i)
+        {
+            saItemTypeNm.add(String(kItemProperName[i].c_str()));
+        }
+        saItemTypeNm.add(String(kItemProperUnknown.c_str()));
+        for (int i = 0; i < kItemSpTypeNum; ++i)
+        {
+            saItemTypeSp.add(String(kItemProperName[i + kItemNmTypeNum].c_str()));
+        }
+        saItemTypeSp.add(String(kItemProperUnknown.c_str()));
+        for (int i = 0; i < kItemUseTypeNum; ++i)
+        {
+            saItemTypeUse.add(String(kItemProperName[
+                i + kItemNmTypeNum + kItemSpTypeNum].c_str()));
+        }
+        saItemTypeUse.add(String(kItemProperUnknown.c_str()));
+
         lbl_Price__Val.setEditable(true);
-        StringArray st;
-        for (int i = 0; i < 78; ++i)
-        {
-            st.add(String(kItemProperName[i].c_str()));
-        }
-        combo_EffectNVal.addItemList(st, 1);
-//         combo_EffectVVal.setText("100", dontSendNotification);
-        //combo_EffectVVal.addItem("30", -1);
-        StringArray stType;
-        for (int i = 0; i < 18; ++i)
-        {
-            stType.add(String(kItemProperName[i].c_str()));
-        }
-        combo_TypeNamVal.addItemList(stType, 1);
-        lbl_OriginVVal.setText("100", dontSendNotification);
+        lbl_Price__Val.addListener(this);
+        combo_EffectNVal.addItemList(saItemTypeSp, 1);
+        combo_TypeNamVal.addItemList(saItemTypeNm, 1);
         lbl_OriginVVal.setEditable(true);
-        lbl_LvDelt_Val.setText("100", dontSendNotification);
+        lbl_OriginVVal.addListener(this);
         lbl_LvDelt_Val.setEditable(true);
+        lbl_LvDelt_Val.addListener(this);
+
+        combo_EffectNVal.addListener(this);
+        combo_EffectVVal.setEditableText(true);
+        combo_EffectVVal.addListener(this);
+        combo_TypeNamVal.addListener(this);
 
         UILC::Set_Comp_Size(&lbl_WCANam_Val, "UL_WCA_lbl_WCANam_Val");
         UILC::Set_Comp_Size(&lbl_PicNum_Val, "UL_WCA_lbl_PicNum_Val");
@@ -174,6 +202,10 @@ public:
         UILC::Set_Comp_Size(&combo_TypeNamVal, "UL_WCA_lbl_TypeNamVal");
         UILC::Set_Comp_Size(&lbl_OriginVVal, "UL_WCA_lbl_OriginVVal");
         UILC::Set_Comp_Size(&lbl_LvDelt_Val, "UL_WCA_lbl_LvDelt_Val");
+
+        btn_WriteCurSel.setButtonText(UILC::Get_UI_Text("cczAssistMain_Text_WriteIn"));
+        btn_WriteCurSel.addListener(this);
+        UILC::Set_Comp_Size(&btn_WriteCurSel, "UL_WCA_btn_Write_Cur");
 
         addAndMakeVisible(lstWCA);
         addAndMakeVisible(lbl_WCAName);
@@ -193,6 +225,8 @@ public:
         addAndMakeVisible(combo_TypeNamVal);
         addAndMakeVisible(lbl_OriginVVal);
         addAndMakeVisible(lbl_LvDelt_Val);
+
+        addAndMakeVisible(btn_WriteCurSel);
     }
 
     ~WCATabPageComp()
@@ -230,6 +264,8 @@ public:
         UILC::Set_Comp_Pos(&combo_TypeNamVal, "UL_WCA_lbl_TypeNamVal");
         UILC::Set_Comp_Pos(&lbl_OriginVVal, "UL_WCA_lbl_OriginVVal");
         UILC::Set_Comp_Pos(&lbl_LvDelt_Val, "UL_WCA_lbl_LvDelt_Val");
+
+        UILC::Set_Comp_Pos(&btn_WriteCurSel, "UL_WCA_btn_Write_Cur");
     }
 
     void initData()
@@ -241,8 +277,125 @@ public:
         onSelectedRowChanged(lstSelect);
     }
 
+    void labelTextChanged (Label* labelThatHasChanged)
+    {
+        if (labelThatHasChanged == &lbl_Price__Val)
+        {
+            int prc = lbl_Price__Val.getText().getIntValue();
+            if (prc >= 0 && prc <= 255 )
+            {
+                tmpItemDetail.byPrice = prc;
+            }
+            else
+            {
+                tmpItemDetail.byPrice = 255;
+                LOG("Invalid price value!, Set to 255!");
+            }
+            if (tmpItemDetail.byPrice == 255)
+            {
+                lbl_Price__Val.setText(UILC::Get_UI_Text(
+                    "cczWCA_Text_NoPrice"), dontSendNotification);
+            }
+        }
+        else if (labelThatHasChanged == &lbl_OriginVVal)
+        {
+            int oriVal = lbl_OriginVVal.getText().getIntValue();
+            if (oriVal >= 0 && oriVal <= 255)
+            {
+                tmpItemDetail.byLvOne = oriVal;
+            }
+            else
+            {
+                lbl_OriginVVal.setText(String(0), dontSendNotification);
+                LOG("Invalid Origin value!, 0 - 255!");
+                return;
+            }
+        }
+        else if (labelThatHasChanged == &lbl_LvDelt_Val)
+        {
+            int lvDlt = lbl_LvDelt_Val.getText().getIntValue();
+            if (lvDlt >= 0 && lvDlt <= 255)
+            {
+                tmpItemDetail.byLvInc = lvDlt;
+            }
+            else
+            {
+                lbl_LvDelt_Val.setText(String(0), dontSendNotification);
+                LOG("Invalid Level Increase value!, 0 - 255!");
+                return;
+            }
+        }
+        else
+        {
+            LOG("The labelThatHasChanged isn't listened");
+            return;
+        }
+        lstModel.setModify(lstWCA.getSelectedRow(), tmpItemDetail);
+    }
+
+    void comboBoxChanged (ComboBox* comboBoxThatHasChanged)
+    {
+        if (comboBoxThatHasChanged == &combo_EffectVVal)
+        {
+            int effVal = combo_EffectVVal.getText().getIntValue();
+            if (effVal >= 0 && effVal <= 255)
+            {
+                tmpItemDetail.bySpValue = effVal;
+            }
+            else
+            {
+                combo_EffectVVal.setText(String("0"), dontSendNotification);
+                LOG("Invalid Special Effect Value");
+                return;
+            }
+        }
+        else if (comboBoxThatHasChanged == &combo_TypeNamVal)
+        {
+            int selIdx = combo_TypeNamVal.getSelectedItemIndex();
+            if (selIdx >= 0 && selIdx < 18)
+            {
+                tmpItemDetail.byType = selIdx;
+            }
+            else
+            {
+                LOG("Type should be [0, 18)");
+                return;
+            }
+        }
+        else if (comboBoxThatHasChanged == &combo_EffectNVal)
+        {
+            int selIdx = combo_EffectNVal.getSelectedItemIndex();
+            if (selIdx >= 0 && selIdx < kItemSpTypeNum)
+            {
+                tmpItemDetail.bySpEffect = selIdx + kItemNmTypeNum;
+            }
+            else
+            {
+                LOG("Special Effect idx Wrong!");
+                return;
+            }
+        }
+        else
+        {
+            LOG("The comboBoxThatHasChanged isn't listened");
+            return;
+        }
+        lstModel.setModify(lstWCA.getSelectedRow(), tmpItemDetail);
+    }
+
+    void editorShown (Label* , TextEditor& edt) 
+    {
+        edt.setColour(TextEditor::backgroundColourId, findColour(TextEditor::backgroundColourId));
+        edt.setColour(TextEditor::outlineColourId, findColour(TextEditor::outlineColourId));
+    }
+
     void buttonClicked(Button* btnThatClicked)
     {
+        if (btnThatClicked == &btn_WriteCurSel)
+        {
+            cczAssistLibLoader::getInstance()->WriteItemToCcz(
+                lstWCA.getSelectedRow(), tmpItemDetail);
+        }
     }
 
     void textEditorTextChanged (TextEditor& edt)
@@ -257,17 +410,17 @@ public:
             LOG(String("Wrong selected Row id: ") + String(rowSelected));
             return;
         }
-        ItemDetail selItem = lstModel.getItemDetail(rowSelected);
-        lbl_WCANam_Val.setText(InputStringConverter::ConvertGBKToUtf8Str(selItem.szName, 
+        tmpItemDetail = lstModel.getItemDetail(rowSelected);
+        lbl_WCANam_Val.setText(InputStringConverter::ConvertGBKToUtf8Str(tmpItemDetail.szName, 
             17), dontSendNotification);
-        lbl_PicNum_Val.setText(String(selItem.byIcon), dontSendNotification);
-        lbl_Price__Val.setText(selItem.byPrice == 255 ? 
+        lbl_PicNum_Val.setText(String(tmpItemDetail.byIcon), dontSendNotification);
+        lbl_Price__Val.setText(tmpItemDetail.byPrice == 255 ? 
             UILC::Get_UI_Text("cczWCA_Text_NoPrice")
-            : String(selItem.byPrice * 100), dontSendNotification);
-        if (selItem.byType < 18)
+            : String(tmpItemDetail.byPrice), dontSendNotification);
+        if (tmpItemDetail.byType < 18)
         {
             // 武具
-            if (selItem.byType % 2 == 0)
+            if (tmpItemDetail.byType % 2 == 0)
             {
                 combo_EffectNVal.setSelectedId(combo_EffectNVal.getNumItems());
                 combo_EffectVVal.setSelectedId(-1);
@@ -275,20 +428,33 @@ public:
             }
             else
             {
-                combo_EffectNVal.setSelectedItemIndex(selItem.bySpEffect);
-                combo_EffectVVal.setSelectedItemIndex(selItem.bySpValue); // TODO:改为描述
+                combo_EffectNVal.setSelectedItemIndex(tmpItemDetail.bySpEffect - kItemNmTypeNum);
+                combo_EffectVVal.setText(String(tmpItemDetail.bySpValue)); // TODO:改为描述
                 combo_EffectVVal.setEnabled(true);
             }
             combo_TypeNamVal.setEnabled(true);
-            combo_TypeNamVal.setSelectedItemIndex(selItem.byType);
-            lbl_OriginVVal.setText(String(selItem.byLvOne), dontSendNotification);
-            lbl_LvDelt_Val.setText(String(selItem.byLvInc), dontSendNotification);
+            combo_TypeNamVal.setSelectedItemIndex(tmpItemDetail.byType);
+            lbl_OriginVVal.setText(String(tmpItemDetail.byLvOne), dontSendNotification);
+            lbl_LvDelt_Val.setText(String(tmpItemDetail.byLvInc), dontSendNotification);
         }
-        else
+        else 
         {
-            // 辅助
-            combo_EffectNVal.setSelectedItemIndex(selItem.byAstSpEff);
-            combo_EffectVVal.setSelectedItemIndex(selItem.byAstSpValue); // TODO:改为描述
+            if(tmpItemDetail.byAstSpEff < Use_4HP)
+            {
+                // 辅助
+                combo_EffectNVal.clear(dontSendNotification);
+                combo_EffectNVal.addItemList(saItemTypeSp, 1);
+                combo_EffectNVal.setSelectedItemIndex(tmpItemDetail.byAstSpEff - kItemNmTypeNum);
+            }
+            else
+            {
+                // 消耗品
+                combo_EffectNVal.clear(dontSendNotification);
+                combo_EffectNVal.addItemList(saItemTypeUse, 1);
+                combo_EffectNVal.setSelectedItemIndex(
+                    tmpItemDetail.byAstSpEff - kItemNmTypeNum - kItemSpTypeNum);
+            }
+            combo_EffectVVal.setText(String(tmpItemDetail.byAstSpValue)); // TODO:改为描述
             combo_EffectVVal.setEnabled(true);
             combo_TypeNamVal.setSelectedId(-1);
             combo_TypeNamVal.setEnabled(false);
@@ -306,6 +472,12 @@ public:
             initData();
         }
     }
+
+private:
+    StringArray  saItemTypeNm;
+    StringArray  saItemTypeSp;
+    StringArray  saItemTypeUse;
+    ItemDetail   tmpItemDetail;
 
 private:
     ListBox      lstWCA;
@@ -328,6 +500,8 @@ private:
     ComboBox    combo_TypeNamVal;
     Label       lbl_OriginVVal;
     Label       lbl_LvDelt_Val;
+
+    TextButton  btn_WriteCurSel;
 
 private:
     //==============================================================================

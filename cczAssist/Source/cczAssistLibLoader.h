@@ -113,8 +113,8 @@ public:
     std::vector<ItemDetail> GetCczItems(bool bRepeatForGetData = false)
     {
         std::vector<ItemDetail> allItems;
-        int itemNum = 104;
-        unsigned long itemOffset = 0xA1140;
+        int itemNum = kItemsNum;
+        unsigned long itemOffset = kItemsOffset;
         size_t rsize = itemNum * sizeof(ItemDetail);
         std::vector<byte> itemMem;
         int maxRepeat = 1000;
@@ -139,6 +139,19 @@ public:
             LOG("Get Mem failed!");
         }
         return allItems;
+    }
+
+    void WriteItemToCcz(int idx, const ItemDetail& itDtl)
+    {
+        if (idx < 0 || idx >= kItemsNum)
+        {
+            LOG("Bad Item Idx to Write");
+            return;
+        }
+        unsigned long aOffset = kItemsOffset + idx * sizeof(ItemDetail);
+        const int noMod = 17;
+        aOffset += noMod;
+        SetCczMemory(aOffset, (const byte *)&itDtl + noMod, sizeof(ItemDetail) - noMod);
     }
 
 private:
