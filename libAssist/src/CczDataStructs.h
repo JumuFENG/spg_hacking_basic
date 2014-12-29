@@ -4,6 +4,7 @@
 #define CCZ_ASSIST_DATASTRUCTURE_INCLUDE_H
 
 #include <WinBase.h>
+#include <assert.h>
 
 enum ItemProperty{
     // Nm_: Normal Sp_: Special
@@ -13,7 +14,7 @@ enum ItemProperty{
     Ef_RenewHP, Ef_RenewMP, Ef_Wakeup, Ef_GetExp, Ef_WeaponExp,
     Ef_ClothExp, Ef_Atk, Ef_Vgr, Ef_Def, Ef_Erupt, Ef_Luck, Ef_GainHP, Ef_GainMP,
     Ef_GainExp, Ef_AddMv, Ef_Assault, Ef_Adverse, Ef_Confus, Ef_Poison, Ef_Paralysis,
-    Ef_NoMagic, Ef_AddHtRt, Ef_StrikeBk, Ef_CritHit, Ef_FarAtk, Ef_PenetrateAtk, 
+    Ef_NoMagic, Ef_AddHtRt, Ef_StrikeBk, Ef_CritHit, Ef_FarAtk, Ef_MultiAtk, 
     Ef_NoAntiAtk, Ef_HouseAtk, Ef_GoOnAtk, Ef_AddFireMagic, Ef_AddWindMagic,
     Ef_SavMP, Ef_Summon, Ef_MagicSimu, Ef_AddMagicRt, Ef_RaiseAtkDef, Ef_RaisMagicDef,
     Ef_RaisAllDef, Ef_IgnorFarAtk, Ef_IgnorCritAtk, Ef_Ignor2ndAtk, Ef_LessMagicHurt,
@@ -109,6 +110,36 @@ const std::wstring kItemProperName[] ={
     L"士气上升(整数)",
     L"等级上升",
     L"兵种上升",
+};
+
+const std::wstring kFarawayAttackDescpt[] =
+{
+    L"轻骑兵",
+    L"步兵",
+    L"弓兵",
+    L"弩兵",
+    L"连弩兵",
+    L"爆炎"
+    L"没羽箭",
+    L"炮车",
+    L"重炮车"
+    L"弓骑兵",
+    L"全屏",
+    L"无",
+    L"骑兵+弩兵",
+    L"骑兵+连弩兵",
+    L"小方框",
+    L"大方框"
+};
+const std::wstring kMutiAttackDescpt[] =
+{
+    L"正常",
+    L"十字",
+    L"九宫",
+    L"没羽箭",
+    L"穿透2格",
+    L"穿透6格",
+    L"片伤" // 骑兵 + 连弩兵
 };
 
 #pragma pack(1)
@@ -227,5 +258,186 @@ typedef struct _JobData
 }JobData, PJobData;
 
 #pragma pack()
+
+enum CczItemType{
+    Item_Unknown,
+    Item_Generic,   // 武具
+    Item_Assist,    // 辅助
+    Item_Use        // 消耗品
+};
+
+enum CczValidSpEffVal{
+    Valid_NoValid,
+    Valid_Rate,
+    Valid_10BaseRate,  // 10的倍数，孟德新书 1.5倍，其值为15
+    Valid_Integer,
+    Valid_Enums
+};
+
+class ClsItemDetail{
+public:
+    ClsItemDetail(const ItemDetail& idtl)
+        : m_itmDetail(idtl)
+    {
+        byte tp = idtl.byType;
+        if ( tp >= Nm_Sword && tp <= Sp_Suit)
+        {
+            m_iType = Item_Generic;
+        }
+        else
+        {
+            tp = idtl.byAstSpEff;
+            if (tp >= Ef_RenewHP && tp <= Ef_AutoUseFrt)
+            {
+                m_iType = Item_Assist;
+            }
+            else if (tp >= Use_4HP && tp <= Use_UpArmLv)
+            {
+                m_iType = Item_Use;
+            }
+        }
+    }
+
+    ~ClsItemDetail()
+    {
+
+    }
+
+    void setItemTypeValue(byte val)
+    {
+        // 武具才调用该接口，否则调用别的接口
+        assert (val >= Nm_Sword && val <= Sp_Suit );
+        m_itmDetail.byType = val;
+        m_iType = Item_Generic;
+    }
+
+    void setItemSpEffct(byte sp)
+    {
+        assert (sp >= Ef_RenewHP && sp <= Use_UpArmLv);
+        assert (m_iType != Item_Unknown);
+        if (m_iType == Item_Generic)
+        {
+            m_itmDetail.bySpEffect = sp;
+        }
+        else
+        {
+            m_itmDetail.byAstSpEff = sp;
+        }
+    }
+
+    void setItemSpecialEffValue(byte spval)
+    {
+        assert(m_iType != Item_Unknown);
+        if (m_iType == Item_Generic)
+        {
+            m_itmDetail.bySpValue = spval;
+        }
+        else
+        {
+            m_itmDetail.byAstSpValue = spval;
+        }
+    }
+
+    void setItemPrice(byte prc)
+    {
+        m_itmDetail.byPrice = prc;
+    }
+
+    void setItemOriginVal(byte val)
+    {
+        assert(m_iType == Item_Generic);
+        m_itmDetail.byLvOne = val;
+    }
+
+    void setIsSpecialItem(bool isp)
+    {
+        m_itmDetail.bIsSpItem = isp;
+    }
+
+    void setIconPicId(byte icid)
+    {
+        m_itmDetail.byIcon = icid;
+    }
+
+    void setLvDeltaVal(bool val)
+    {
+        assert(m_iType == Item_Generic);
+        m_itmDetail.byLvInc = val;
+    }
+
+public:
+    static CczValidSpEffVal valueTypeOfSpEffect(byte spEff)
+    {
+        switch (spEff)
+        {
+        case Ef_GainExp:
+            return Valid_10BaseRate;
+
+        case Ef_Wakeup: case Ef_Assault:   case Ef_Adverse: 
+        case Ef_Confus: case Ef_Poison:    case Ef_Paralysis:
+        case Ef_NoMagic:case Ef_GoOnAtk:   case Ef_MagicSimu:
+        case Ef_MPasHP: case Ef_NoAntiAtk: case Ef_IgnorFarAtk:
+        case Ef_CritHit:case Ef_StrikeBk:  case Ef_IgnorCritAtk:
+        case Ef_Ignor2ndAtk:
+        case Use_4Confus: case Use_4Poison: case Use_4Paralysis:
+        case Use_4Magic:  case Use_4AllBad: 
+        case Ef_AutoUseFrt: case Use_UpLv: case Use_UpArmLv:
+            return Valid_NoValid;
+
+        case Ef_GetExp: case Ef_WeaponExp: case Ef_ClothExp:
+        case Ef_Atk:    case Ef_Vgr:       case Ef_Def:
+        case Ef_Erupt:  case Ef_Luck:      case Ef_GainHP:
+        case Ef_GainMP: case Ef_AddMv: 
+        case Use_4HP:       case Use_4MP:      case Use_UpFourc:
+        case Use_UpSpirit:  case Use_UpLeadCap:case Use_UpAgileCap:
+        case Use_UpMorale:
+            return Valid_Integer;
+
+        case Ef_RenewHP: case Ef_RenewMP:     case Ef_AddHtRt:
+        case Ef_HouseAtk:case Ef_AddFireMagic:case Ef_AddWindMagic:
+        case Ef_SavMP:   case Ef_AddMagicRt:  case Ef_RaiseAtkDef:
+        case Ef_RaisMagicDef:
+        case Ef_RaisAllDef:   case Ef_LessMagicHurt: case Ef_LeesFarAtk:
+            return Valid_Rate;
+
+        case Ef_FarAtk:  case Ef_MultiAtk: 
+        case Ef_Summon:
+            return Valid_Enums;
+        }
+    }
+
+    static byte getValidSpValue(byte spEff, byte val)
+    {
+        CczValidSpEffVal cvlid = valueTypeOfSpEffect(spEff);
+        switch (cvlid)
+        {
+        case Valid_Rate:
+            return (0 <= val && val <= 100) ? val : 100;
+        case Valid_Enums:
+            {
+                if (spEff == Ef_Summon)
+                {
+                    return (64 <= val && val <= 67) ? val : 64;
+                }
+                if (spEff == Ef_FarAtk)
+                {
+                    return (val >= 16) ? 11 : val;
+                }
+                if (spEff == Ef_MultiAtk)
+                {
+                    return (val > 6) ? 0 : val;
+                }
+            }
+        case Valid_10BaseRate:
+        case Valid_NoValid:
+        case Valid_Integer:
+            return val;
+        }
+    }
+
+private:
+    ItemDetail   m_itmDetail;
+    CczItemType  m_iType;
+};
 
 #endif // CCZ_ASSIST_DATASTRUCTURE_INCLUDE_H

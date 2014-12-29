@@ -417,7 +417,7 @@ public:
         lbl_Price__Val.setText(tmpItemDetail.byPrice == 255 ? 
             UILC::Get_UI_Text("cczWCA_Text_NoPrice")
             : String(tmpItemDetail.byPrice), dontSendNotification);
-        if (tmpItemDetail.byType < 18)
+        if (tmpItemDetail.byType < Ef_RenewHP)
         {
             // Îä¾ß
             if (tmpItemDetail.byType % 2 == 0)
