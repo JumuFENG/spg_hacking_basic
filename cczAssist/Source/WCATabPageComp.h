@@ -60,7 +60,7 @@ public:
         return items.at(rowNum);
     }
 
-    void setModify(int rowNum, const ItemDetail& idtl )
+    void setModify(int rowNum, const ClsItemDetail& idtl )
     {
         if (rowNum >= items.size() || rowNum < 0)
         {
@@ -114,9 +114,9 @@ private:
     }
 
 private:
-    WCAListListener*        listener;
-    std::vector<ItemDetail> items;
-    std::vector<ItemDetail> itemsModified;
+    WCAListListener*           listener;
+    std::vector<ItemDetail>    items;
+    std::vector<ClsItemDetail> itemsModified;
 };
 
 class WCATabPageComp   : public Component
@@ -282,27 +282,24 @@ public:
         if (labelThatHasChanged == &lbl_Price__Val)
         {
             int prc = lbl_Price__Val.getText().getIntValue();
-            if (prc >= 0 && prc <= 255 )
+            if (prc < 0 || prc > 255 )
             {
-                tmpItemDetail.byPrice = prc;
-            }
-            else
-            {
-                tmpItemDetail.byPrice = 255;
+                prc = 255;
                 LOG("Invalid price value!, Set to 255!");
             }
-            if (tmpItemDetail.byPrice == 255)
+            if (prc == 255)
             {
                 lbl_Price__Val.setText(UILC::Get_UI_Text(
                     "cczWCA_Text_NoPrice"), dontSendNotification);
             }
+            tmpItemDetail.setItemPrice(prc);
         }
         else if (labelThatHasChanged == &lbl_OriginVVal)
         {
             int oriVal = lbl_OriginVVal.getText().getIntValue();
             if (oriVal >= 0 && oriVal <= 255)
             {
-                tmpItemDetail.byLvOne = oriVal;
+                tmpItemDetail.setItemOriginVal(oriVal);
             }
             else
             {
@@ -316,7 +313,7 @@ public:
             int lvDlt = lbl_LvDelt_Val.getText().getIntValue();
             if (lvDlt >= 0 && lvDlt <= 255)
             {
-                tmpItemDetail.byLvInc = lvDlt;
+                tmpItemDetail.setLvDeltaVal(lvDlt);
             }
             else
             {
@@ -340,7 +337,7 @@ public:
             int effVal = combo_EffectVVal.getText().getIntValue();
             if (effVal >= 0 && effVal <= 255)
             {
-                tmpItemDetail.bySpValue = effVal;
+                tmpItemDetail.setItemSpecialEffValue(effVal);
             }
             else
             {
@@ -354,11 +351,12 @@ public:
             int selIdx = combo_TypeNamVal.getSelectedItemIndex();
             if (selIdx >= 0 && selIdx < 18)
             {
-                tmpItemDetail.byType = selIdx;
+                tmpItemDetail.setItemTypeValue(selIdx);
             }
             else
             {
-                LOG("Type should be [0, 18)");
+                tmpItemDetail.changeToAssist();
+                LOG("Change The Item to Assit!");
                 return;
             }
         }
@@ -367,7 +365,7 @@ public:
             int selIdx = combo_EffectNVal.getSelectedItemIndex();
             if (selIdx >= 0 && selIdx < kItemSpTypeNum)
             {
-                tmpItemDetail.bySpEffect = selIdx + kItemNmTypeNum;
+                tmpItemDetail.setItemSpEffct(selIdx + kItemNmTypeNum);
             }
             else
             {
@@ -394,7 +392,7 @@ public:
         if (btnThatClicked == &btn_WriteCurSel)
         {
             cczAssistLibLoader::getInstance()->WriteItemToCcz(
-                lstWCA.getSelectedRow(), tmpItemDetail);
+                lstWCA.getSelectedRow(), tmpItemDetail.getItemDetailPure());
         }
     }
 
@@ -410,17 +408,17 @@ public:
             LOG(String("Wrong selected Row id: ") + String(rowSelected));
             return;
         }
-        tmpItemDetail = lstModel.getItemDetail(rowSelected);
-        lbl_WCANam_Val.setText(InputStringConverter::ConvertGBKToUtf8Str(tmpItemDetail.szName, 
-            17), dontSendNotification);
-        lbl_PicNum_Val.setText(String(tmpItemDetail.byIcon), dontSendNotification);
-        lbl_Price__Val.setText(tmpItemDetail.byPrice == 255 ? 
+        tmpItemDetail.setItemDetail(lstModel.getItemDetail(rowSelected));
+        lbl_WCANam_Val.setText(InputStringConverter::ConvertGBKToUtf8Str(
+            tmpItemDetail.getItemName(), 17), dontSendNotification);
+        lbl_PicNum_Val.setText(String(tmpItemDetail.getItemIcon()), dontSendNotification);
+        lbl_Price__Val.setText(tmpItemDetail.getItemPrice() == 255 ? 
             UILC::Get_UI_Text("cczWCA_Text_NoPrice")
-            : String(tmpItemDetail.byPrice), dontSendNotification);
-        if (tmpItemDetail.byType < Ef_RenewHP)
+            : String(tmpItemDetail.getItemPrice()), dontSendNotification);
+        if (tmpItemDetail.isGenericItem())
         {
             // 武具
-            if (tmpItemDetail.byType % 2 == 0)
+            if (tmpItemDetail.getItemType() % 2 == 0)
             {
                 combo_EffectNVal.setSelectedId(combo_EffectNVal.getNumItems());
                 combo_EffectVVal.setSelectedId(-1);
@@ -428,23 +426,24 @@ public:
             }
             else
             {
-                combo_EffectNVal.setSelectedItemIndex(tmpItemDetail.bySpEffect - kItemNmTypeNum);
-                combo_EffectVVal.setText(String(tmpItemDetail.bySpValue)); // TODO:改为描述
+                combo_EffectNVal.setSelectedItemIndex(tmpItemDetail.getItemSpecial() - kItemNmTypeNum);
+                combo_EffectVVal.setText(String(tmpItemDetail.getItemSpecialValue())); // TODO:改为描述
                 combo_EffectVVal.setEnabled(true);
             }
             combo_TypeNamVal.setEnabled(true);
-            combo_TypeNamVal.setSelectedItemIndex(tmpItemDetail.byType);
-            lbl_OriginVVal.setText(String(tmpItemDetail.byLvOne), dontSendNotification);
-            lbl_LvDelt_Val.setText(String(tmpItemDetail.byLvInc), dontSendNotification);
+            combo_TypeNamVal.setSelectedItemIndex(tmpItemDetail.getItemType());
+            lbl_OriginVVal.setText(String(tmpItemDetail.getItemOriginVal()), dontSendNotification);
+            lbl_LvDelt_Val.setText(String(tmpItemDetail.getItemLvDelta()), dontSendNotification);
         }
         else 
         {
-            if(tmpItemDetail.byAstSpEff < Use_4HP)
+            if(tmpItemDetail.isAssistItem())
             {
                 // 辅助
                 combo_EffectNVal.clear(dontSendNotification);
                 combo_EffectNVal.addItemList(saItemTypeSp, 1);
-                combo_EffectNVal.setSelectedItemIndex(tmpItemDetail.byAstSpEff - kItemNmTypeNum);
+                combo_EffectNVal.setSelectedItemIndex(
+                    tmpItemDetail.getItemSpecial() - kItemNmTypeNum);
             }
             else
             {
@@ -452,9 +451,9 @@ public:
                 combo_EffectNVal.clear(dontSendNotification);
                 combo_EffectNVal.addItemList(saItemTypeUse, 1);
                 combo_EffectNVal.setSelectedItemIndex(
-                    tmpItemDetail.byAstSpEff - kItemNmTypeNum - kItemSpTypeNum);
+                    tmpItemDetail.getItemSpecial() - kItemNmTypeNum - kItemSpTypeNum);
             }
-            combo_EffectVVal.setText(String(tmpItemDetail.byAstSpValue)); // TODO:改为描述
+            combo_EffectVVal.setText(String(tmpItemDetail.getItemSpecialValue())); // TODO:改为描述
             combo_EffectVVal.setEnabled(true);
             combo_TypeNamVal.setSelectedId(-1);
             combo_TypeNamVal.setEnabled(false);
@@ -477,7 +476,7 @@ private:
     StringArray  saItemTypeNm;
     StringArray  saItemTypeSp;
     StringArray  saItemTypeUse;
-    ItemDetail   tmpItemDetail;
+    ClsItemDetail   tmpItemDetail;
 
 private:
     ListBox      lstWCA;

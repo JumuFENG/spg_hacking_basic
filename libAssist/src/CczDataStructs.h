@@ -131,6 +131,7 @@ const std::wstring kFarawayAttackDescpt[] =
     L"小方框",
     L"大方框"
 };
+
 const std::wstring kMutiAttackDescpt[] =
 {
     L"正常",
@@ -141,6 +142,15 @@ const std::wstring kMutiAttackDescpt[] =
     L"穿透6格",
     L"片伤" // 骑兵 + 连弩兵
 };
+
+const std::wstring kDescFitArmy[] = {
+    L"群雄",
+    L"步兵",// 弩兵 骑兵 弓骑兵 炮车 武术家 贼兵 策士 风水士 道士 
+    L""     // 11骑马参谋 舞娘 西凉骑兵 黄巾军 海盗 训熊师 训虎师 都督
+    //19 咒术士 仙人 辎重队 粮草队 木人
+    //24 土偶 皇帝 百姓
+    //255 全部可用
+}
 
 #pragma pack(1)
 
@@ -233,12 +243,18 @@ typedef struct _ItemDetail
     };
     byte byPrice;//0xFF means not-for-sale
     byte byIcon;
-    byte bySpEffect;
+    union{
+        byte bySpEffect;
+        byte byAst21ph;   // 辅助该项无意义，均为FF
+    };
     union{
         byte byLvOne;     // 武具表示一级初始值
         byte byAstSpValue;// 辅助表示特殊效果值
     };
-    byte bySpValue;
+    union{
+        byte bySpValue;
+        byte byAst23ph;   // 辅助该项无意义，均为00
+    };
     union{
         byte byLvInc;     // 武具表示升级成长值
         byte byAstFitArmy;// 辅助表示适用兵种
@@ -276,9 +292,72 @@ enum CczValidSpEffVal{
 
 class ClsItemDetail{
 public:
-    ClsItemDetail(const ItemDetail& idtl)
-        : m_itmDetail(idtl)
+    ClsItemDetail()
     {
+
+    }
+
+    ClsItemDetail(const ItemDetail& idtl)
+    {
+        setItemDetail(idtl);
+    }
+
+    ~ClsItemDetail()
+    {
+
+    }
+
+    ItemDetail getItemDetailPure()
+    {
+        if (m_iType == Item_Unknown)
+        {
+            if ( m_byType >= Nm_Sword && m_byType <= Sp_Suit)
+            {
+                m_iType = Item_Generic;
+            }
+            else
+            {
+                if (m_bySpEffect >= Ef_RenewHP && m_bySpEffect <= Ef_AutoUseFrt)
+                {
+                    m_iType = Item_Assist;
+                }
+                else if (m_bySpEffect >= Use_4HP && m_bySpEffect <= Use_UpArmLv)
+                {
+                    m_iType = Item_Use;
+                }
+            }
+        }
+        ItemDetail rtIdtl = {0};
+        memcpy(rtIdtl.szName, m_szName, 17);
+        rtIdtl.byIcon = m_byIcon;
+        rtIdtl.byPrice = m_byPrice;
+        rtIdtl.bIsSpItem = m_bIsSpecial;
+        if (m_iType == Item_Generic)
+        {
+            rtIdtl.byType = m_byType;
+            rtIdtl.bySpEffect = m_bySpEffect;
+            rtIdtl.bySpValue = m_bySpValue;
+            rtIdtl.byLvOne = m_byLvOne;
+            rtIdtl.byLvInc = m_byLvInc;
+        }
+        else
+        {
+            rtIdtl.byAstSpEff = m_bySpEffect;
+            rtIdtl.byAstSpValue = m_bySpValue;
+            rtIdtl.byAstFitArmy = m_byLvInc;
+            rtIdtl.byAst21ph = 0xFF;
+            rtIdtl.byAst23ph = 0x00;
+        }
+        return rtIdtl;
+    }
+
+    void setItemDetail(ItemDetail idtl)
+    {
+        m_bIsSpecial = idtl.bIsSpItem;
+        m_byIcon = idtl.byIcon;
+        m_byPrice = idtl.byPrice;
+        memcpy(m_szName, idtl.szName, 17);
+
         byte tp = idtl.byType;
         if ( tp >= Nm_Sword && tp <= Sp_Suit)
         {
@@ -296,18 +375,48 @@ public:
                 m_iType = Item_Use;
             }
         }
+
+        if (m_iType == Item_Generic)
+        {
+            m_byType = idtl.byType;
+            m_bySpEffect = idtl.bySpEffect;
+            m_bySpValue = idtl.bySpValue;
+            m_byLvOne = idtl.byLvOne;
+            m_byLvInc = idtl.byLvInc;
+        }
+        else if (m_iType == Item_Use || m_iType == Item_Assist)
+        {
+            m_byType = 0;
+            m_byLvOne = 0;
+            m_bySpEffect = idtl.byAstSpEff;
+            m_bySpValue = idtl.byAstSpValue;
+            m_byLvInc = idtl.byAstFitArmy;
+        }
     }
 
-    ~ClsItemDetail()
+    void changeToGeneric(byte tp)
     {
+        assert( Nm_Sword <= tp && tp <= Sp_Suit);
+        setItemTypeValue(tp);
+    }
 
+    void changeToAssist()
+    {
+        if (m_bySpEffect >= Ef_RenewHP && m_bySpEffect <= Ef_AutoUseFrt)
+        {
+            m_iType = Item_Assist;
+        }
+        else if (m_bySpEffect >= Use_4HP && m_bySpEffect <= Use_UpArmLv)
+        {
+            m_iType = Item_Use;
+        }
     }
 
     void setItemTypeValue(byte val)
     {
         // 武具才调用该接口，否则调用别的接口
         assert (val >= Nm_Sword && val <= Sp_Suit );
-        m_itmDetail.byType = val;
+        m_byType = val;
         m_iType = Item_Generic;
     }
 
@@ -315,55 +424,58 @@ public:
     {
         assert (sp >= Ef_RenewHP && sp <= Use_UpArmLv);
         assert (m_iType != Item_Unknown);
-        if (m_iType == Item_Generic)
-        {
-            m_itmDetail.bySpEffect = sp;
-        }
-        else
-        {
-            m_itmDetail.byAstSpEff = sp;
-        }
+        m_bySpEffect = sp;
     }
 
     void setItemSpecialEffValue(byte spval)
     {
         assert(m_iType != Item_Unknown);
-        if (m_iType == Item_Generic)
-        {
-            m_itmDetail.bySpValue = spval;
-        }
-        else
-        {
-            m_itmDetail.byAstSpValue = spval;
-        }
+        m_bySpValue = spval;
     }
 
     void setItemPrice(byte prc)
     {
-        m_itmDetail.byPrice = prc;
+        m_byPrice = prc;
     }
 
     void setItemOriginVal(byte val)
     {
-        assert(m_iType == Item_Generic);
-        m_itmDetail.byLvOne = val;
+        m_byLvOne = val;
     }
 
     void setIsSpecialItem(bool isp)
     {
-        m_itmDetail.bIsSpItem = isp;
+        m_bIsSpecial = isp;
     }
 
     void setIconPicId(byte icid)
     {
-        m_itmDetail.byIcon = icid;
+        m_byIcon = icid;
     }
 
     void setLvDeltaVal(bool val)
     {
-        assert(m_iType == Item_Generic);
-        m_itmDetail.byLvInc = val;
+        m_byLvInc = val;
     }
+
+    void setFitArmyType(byte val)
+    {
+        setLvDeltaVal(val);
+    }
+
+    const char* getItemName() { return m_szName; }
+    byte getItemIcon() { return m_byIcon; }
+    byte getItemPrice() { return m_byPrice; }
+    byte getItemSpecial() { return m_bySpEffect; }
+    byte getItemSpecialValue() { return m_bySpValue; }
+    byte getItemType() { return m_byType; }
+    byte getItemOriginVal() { return m_byLvOne; }
+    byte getItemLvDelta() { return m_byLvInc; }
+    byte getAssistFitArmy() { return m_byLvInc; }
+
+    bool isGenericItem(){ return m_iType == Item_Generic; }
+    bool isAssistItem() { return m_iType == Item_Assist; }
+    bool isAstUseItem() { return m_iType == Item_Use; }
 
 public:
     static CczValidSpEffVal valueTypeOfSpEffect(byte spEff)
@@ -436,8 +548,16 @@ public:
     }
 
 private:
-    ItemDetail   m_itmDetail;
-    CczItemType  m_iType;
+    char    m_szName[17];
+    byte    m_byType;
+    byte    m_byPrice;
+    byte    m_byIcon;
+    byte    m_bySpEffect;
+    byte    m_bySpValue;
+    byte    m_byLvOne;
+    byte    m_byLvInc;      // 升级成长值，辅助表示适合兵种
+    bool    m_bIsSpecial;
+    CczItemType m_iType;
 };
 
 #endif // CCZ_ASSIST_DATASTRUCTURE_INCLUDE_H

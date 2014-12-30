@@ -94,7 +94,7 @@ namespace InputStringConverter {
         return rlt;
     }
 
-    String inline ConvertGBKToUtf8Str(char* pCh, int len)
+    String inline ConvertGBKToUtf8Str(const char* pCh, int len)
     {
         std::vector<char> vecGbk;
         for (int i = 0; i < len; ++i)
