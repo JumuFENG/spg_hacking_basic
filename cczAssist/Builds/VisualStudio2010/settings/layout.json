@@ -40,6 +40,11 @@
   "UL_WCA_lbl_OriginVal": "130 230 70 25",
   "UL_WCA_lbl_LvDelta": "130 260 70 25",
 
+  "UL_Radio_itype_Normal":"130 025 70 23",
+  "UL_Radio_itype_Specia":"200 025 70 23",
+  "UL_Radio_itype_Assist":"270 025 50 23",
+  "UL_Radio_itype_UseItm":"320 025 60 23",
+
   "UL_WCA_lbl_WCANam_Val":"210 050 80 25",
   "UL_WCA_lbl_PicNum_Val":"210 080 30 25",
   "UL_WCA_lbl_Price__Val":"210 110 60 25",

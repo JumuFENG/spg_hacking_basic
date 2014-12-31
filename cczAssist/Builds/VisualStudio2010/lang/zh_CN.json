@@ -21,12 +21,18 @@
   "cczAssistMain_Text_Save": "保存",
   "cczAssistMain_Text_WriteIn": "写入",
 
+  "cczWCA_Radio_itype_Normal":"普通武具",
+  "cczWCA_Radio_itype_Specia":"特殊武具",
+  "cczWCA_Radio_itype_Assist":"辅助",
+  "cczWCA_Radio_itype_UseItm":"消耗品",
+
   "cczWCA_Label_WCAName":"名称",
   "cczWCA_Label_PicNum":"图标编号",
   "cczWCA_Label_Price":"价格(x100)",
   "cczWCA_Label_EffectName":"效果",
   "cczWCA_Label_EffectVal":"效果值",
   "cczWCA_Label_TypeName":"属性",
+  "cczWCA_Label_FitArmy":"适用兵种",
   "cczWCA_Label_OriginVal":"初始值",
   "cczWCA_Label_LvDelta":"升级成长",
   "cczWCA_Text_NoPrice":"非卖品",

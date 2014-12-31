@@ -28,6 +28,7 @@ const static int kItemNmTypeNum = 18;
 const static int kItemSpTypeNum = 45;
 const static int kItemUseTypeNum = 14;
 const static std::wstring kItemProperUnknown = L"无";
+const static int kArmyTypeNum = 27;
 
 const static unsigned long kItemsOffset = 0xA1140;
 const static int kItemsNum = 104;
@@ -51,63 +52,63 @@ const std::wstring kItemProperName[] ={
     L"特殊铠甲",
     L"普通衣服",
     L"特殊衣服",
-    L"每回合恢复HP(百分数)",
-    L"每回合恢复MP(百分数)",
+    L"每回合恢复HP",
+    L"每回合恢复MP",
     L"每回合恢复状态",
-    L"每回合获得Exp(整数)",
-    L"每回合获得武器Exp(整数)",
-    L"每回合获得道具Exp(整数)",
-    L"辅助攻击力(整数)",
-    L"辅助精神力(整数)",
-    L"辅助防御力(整数)",
-    L"辅助爆发力(整数)",
-    L"辅助运气(整数)",
-    L"辅助HP增加(整数)",
-    L"辅助MP增加(整数)",
-    L"辅助获得Exp(十分数)",
-    L"辅助移动力(整数)",
+    L"每回合获得Exp",
+    L"每回合获得武器Exp",
+    L"每回合获得护具Exp",
+    L"辅助攻击力",
+    L"辅助精神力",
+    L"辅助防御力",
+    L"辅助爆发力",
+    L"辅助运气",
+    L"增加HP上限",
+    L"增加MP上限",
+    L"辅助获得Exp",
+    L"辅助移动力",
     L"突击移动",
     L"恶路移动",
     L"混乱攻击",
     L"中毒攻击",
     L"麻痹攻击",
     L"封杀策略",
-    L"辅助攻击命中(百分数)",
+    L"辅助攻击命中",
     L"反击后反击",
     L"致命一击攻击",
-    L"远距离攻击(没羽箭)",
-    L"穿透效果",
+    L"远距攻击",
+    L"穿透攻击",
     L"无反击攻击",
-    L"骑马攻击(百分数)",
+    L"骑马攻击",
     L"引导攻击",
-    L"辅助火类策略(百分数)",
-    L"辅助风类策略(百分数)",
-    L"节约MP(百分数)",
+    L"辅助火类策略",
+    L"辅助风类策略",
+    L"节约MP",
     L"召唤策略",
     L"策略模仿",
-    L"辅助策略命中(百分数)",
-    L"辅助攻击防御(百分数)",
-    L"辅助策略防御(百分数)",
+    L"辅助策略命中",
+    L"辅助攻击防御",
+    L"辅助策略防御",
     L"辅助全防御",
     L"防御远程攻击",
     L"防止致命一击",
     L"防止二次攻击",
-    L"减轻策略损伤(百分数)",
-    L"mp辅助防御",
-    L"减轻远距离损伤(百分数)",
+    L"减轻策略伤害",
+    L"MP辅助防御",
+    L"减轻远距伤害",
     L"自动使用道具",
-    L"获取HP(整数)",
-    L"获取MP(整数)",
+    L"增加HP",
+    L"增加MP",
     L"治疗混乱",
     L"治疗中毒",
     L"治疗麻痹",
     L"治疗禁咒",
     L"治疗一切异常",
-    L"武力上升(整数)",
-    L"智力上升(整数)",
-    L"统帅上升(整数)",
-    L"敏捷上升(整数)",
-    L"士气上升(整数)",
+    L"武力上升",
+    L"智力上升",
+    L"统帅上升",
+    L"敏捷上升",
+    L"士气上升",
     L"等级上升",
     L"兵种上升",
 };
@@ -143,14 +144,37 @@ const std::wstring kMutiAttackDescpt[] =
     L"片伤" // 骑兵 + 连弩兵
 };
 
-const std::wstring kDescFitArmy[] = {
+const std::wstring  kArmyFitAll = L"全部可用";
+
+const std::wstring kArmyNamesDesc[] = {
     L"群雄",
-    L"步兵",// 弩兵 骑兵 弓骑兵 炮车 武术家 贼兵 策士 风水士 道士 
-    L""     // 11骑马参谋 舞娘 西凉骑兵 黄巾军 海盗 训熊师 训虎师 都督
-    //19 咒术士 仙人 辎重队 粮草队 木人
-    //24 土偶 皇帝 百姓
-    //255 全部可用
-}
+    L"步兵",
+    L"弩兵",
+    L"骑兵",
+    L"弓骑兵",
+    L"炮车",
+    L"武术家",
+    L"贼兵",
+    L"策士",
+    L"风水士",
+    L"道士",
+    L"骑马参谋",
+    L"舞娘",
+    L"西凉骑兵",
+    L"黄巾军",
+    L"海盗",
+    L"训熊师",
+    L"训虎师",
+    L"都督",
+    L"咒术士",
+    L"仙人",
+    L"辎重队",
+    L"粮草队",
+    L"木人",
+    L"土偶",
+    L"皇帝",
+    L"百姓"
+};
 
 #pragma pack(1)
 
@@ -277,7 +301,8 @@ typedef struct _JobData
 
 enum CczItemType{
     Item_Unknown,
-    Item_Generic,   // 武具
+    Item_Normal,    // 普通武具
+    Item_Special,   // 特殊武具
     Item_Assist,    // 辅助
     Item_Use        // 消耗品
 };
@@ -313,7 +338,7 @@ public:
         {
             if ( m_byType >= Nm_Sword && m_byType <= Sp_Suit)
             {
-                m_iType = Item_Generic;
+                m_iType = (m_byType & 2 == 0) ? Item_Normal : Item_Special; 
             }
             else
             {
@@ -332,7 +357,7 @@ public:
         rtIdtl.byIcon = m_byIcon;
         rtIdtl.byPrice = m_byPrice;
         rtIdtl.bIsSpItem = m_bIsSpecial;
-        if (m_iType == Item_Generic)
+        if (m_iType == Item_Normal || m_iType == Item_Special)
         {
             rtIdtl.byType = m_byType;
             rtIdtl.bySpEffect = m_bySpEffect;
@@ -361,7 +386,7 @@ public:
         byte tp = idtl.byType;
         if ( tp >= Nm_Sword && tp <= Sp_Suit)
         {
-            m_iType = Item_Generic;
+            m_iType = (idtl.byType & 2 == 0) ? Item_Normal : Item_Special;
         }
         else
         {
@@ -376,7 +401,7 @@ public:
             }
         }
 
-        if (m_iType == Item_Generic)
+        if (m_iType == Item_Normal || m_iType == Item_Special)
         {
             m_byType = idtl.byType;
             m_bySpEffect = idtl.bySpEffect;
@@ -417,7 +442,7 @@ public:
         // 武具才调用该接口，否则调用别的接口
         assert (val >= Nm_Sword && val <= Sp_Suit );
         m_byType = val;
-        m_iType = Item_Generic;
+        m_iType = (val & 2 == 0) ? Item_Normal : Item_Special;;
     }
 
     void setItemSpEffct(byte sp)
@@ -433,36 +458,12 @@ public:
         m_bySpValue = spval;
     }
 
-    void setItemPrice(byte prc)
-    {
-        m_byPrice = prc;
-    }
-
-    void setItemOriginVal(byte val)
-    {
-        m_byLvOne = val;
-    }
-
-    void setIsSpecialItem(bool isp)
-    {
-        m_bIsSpecial = isp;
-    }
-
-    void setIconPicId(byte icid)
-    {
-        m_byIcon = icid;
-    }
-
-    void setLvDeltaVal(bool val)
-    {
-        m_byLvInc = val;
-    }
-
-    void setFitArmyType(byte val)
-    {
-        setLvDeltaVal(val);
-    }
-
+    void setItemPrice(byte prc) { m_byPrice = prc; }
+    void setItemOriginVal(byte val) { m_byLvOne = val; }
+    void setIsSpecialItem(bool isp) { m_bIsSpecial = isp; }
+    void setIconPicId(byte icid){ m_byIcon = icid; }
+    void setLvDeltaVal(bool val){ m_byLvInc = val; }
+    void setFitArmyType(byte val){ setLvDeltaVal(val); }
     const char* getItemName() { return m_szName; }
     byte getItemIcon() { return m_byIcon; }
     byte getItemPrice() { return m_byPrice; }
@@ -473,7 +474,8 @@ public:
     byte getItemLvDelta() { return m_byLvInc; }
     byte getAssistFitArmy() { return m_byLvInc; }
 
-    bool isGenericItem(){ return m_iType == Item_Generic; }
+    bool isNormalItem(){ return m_iType == Item_Normal; }
+    bool isSpecialItem() {return m_iType == Item_Special; }
     bool isAssistItem() { return m_iType == Item_Assist; }
     bool isAstUseItem() { return m_iType == Item_Use; }
 
