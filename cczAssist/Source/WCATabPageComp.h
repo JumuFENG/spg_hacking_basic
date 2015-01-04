@@ -236,6 +236,7 @@ public:
         UILC::Set_Comp_Size(&lbl_Price__Val, "UL_WCA_lbl_Price__Val");
         UILC::Set_Comp_Size(&combo_EffectNVal, "UL_WCA_lbl_EffectNVal");
         UILC::Set_Comp_Size(&combo_EffectVVal, "UL_WCA_lbl_EffectVVal");
+        UILC::Set_Comp_Size(&lbl_EffValTips, "UL_WCA_lbl_EffectVTip");
         UILC::Set_Comp_Size(&combo_TypeNamVal, "UL_WCA_lbl_TypeNamVal");
         UILC::Set_Comp_Size(&lbl_OriginVVal, "UL_WCA_lbl_OriginVVal");
         UILC::Set_Comp_Size(&lbl_LvDelt_Val, "UL_WCA_lbl_LvDelt_Val");
@@ -264,6 +265,7 @@ public:
         addAndMakeVisible(lbl_Price__Val);
         addAndMakeVisible(combo_EffectNVal);
         addAndMakeVisible(combo_EffectVVal);
+        addAndMakeVisible(lbl_EffValTips);
         addAndMakeVisible(combo_TypeNamVal);
         addAndMakeVisible(lbl_OriginVVal);
         addAndMakeVisible(lbl_LvDelt_Val);
@@ -310,6 +312,7 @@ public:
         UILC::Set_Comp_Pos(&combo_EffectNVal, "UL_WCA_lbl_EffectNVal");
         UILC::Set_Comp_Pos(&combo_EffectVVal, "UL_WCA_lbl_EffectVVal");
         UILC::Set_Comp_Pos(&combo_TypeNamVal, "UL_WCA_lbl_TypeNamVal");
+        UILC::Set_Comp_Pos(&lbl_EffValTips, "UL_WCA_lbl_EffectVTip");
         UILC::Set_Comp_Pos(&lbl_OriginVVal, "UL_WCA_lbl_OriginVVal");
         UILC::Set_Comp_Pos(&lbl_LvDelt_Val, "UL_WCA_lbl_LvDelt_Val");
 
@@ -382,7 +385,15 @@ public:
     {
         if (comboBoxThatHasChanged == &combo_EffectVVal)
         {
-            int effVal = combo_EffectVVal.getText().getIntValue();
+            ItemProperty selSp = (ItemProperty)(combo_EffectNVal.
+                getSelectedItemIndex() + kItemNmTypeNum);
+            int effVal = (Valid_Enums == ClsItemDetail::valueTypeOfSpEffect((byte)selSp)) ?
+                combo_EffectVVal.getSelectedItemIndex()
+                : combo_EffectVVal.getText().getIntValue();
+            if (selSp == Ef_Summon)
+            {
+                effVal += 64;
+            }
             if (effVal >= 0 && effVal <= 255)
             {
                 tmpItemDetail.setItemSpecialEffValue(effVal);
@@ -411,9 +422,62 @@ public:
         else if (comboBoxThatHasChanged == &combo_EffectNVal)
         {
             int selIdx = combo_EffectNVal.getSelectedItemIndex();
-            if (selIdx >= 0 && selIdx < kItemSpTypeNum)
+            if (selIdx == kItemSpTypeNum)
             {
-                tmpItemDetail.setItemSpEffct(selIdx + kItemNmTypeNum);
+                // 选择了“无”，取消特殊效果和值
+                tmpItemDetail.removeSpcialEff();
+            }
+            else if (selIdx >= 0 && selIdx < kItemSpTypeNum)
+            {
+                ItemProperty iprty = (ItemProperty)(selIdx + kItemNmTypeNum);
+                String tips;
+                combo_EffectVVal.clear(dontSendNotification);
+                lbl_EffValTips.setText(String::empty, dontSendNotification);
+                switch (ClsItemDetail::valueTypeOfSpEffect((byte)iprty))
+                {
+                case Valid_Enums:
+                    saItemSpEffVal.clear();
+                    switch ( (byte)iprty)
+                    {
+                    case Ef_FarAtk:
+                        for (int i = 0; i < kFarAttackRangeNum; ++i)
+                        {
+                            saItemSpEffVal.add(String(kFarawayAttackDescpt[i].c_str()));
+                        }
+                        break;
+                    case Ef_MultiAtk: 
+                        for (int i = 0; i < kMultiAttkRangeNum; ++i)
+                        {
+                            saItemSpEffVal.add(String(kMutiAttackDescpt[i].c_str()));
+                        }
+                        break;
+                    case Ef_Summon:
+                        for (int i = 0; i < kSummonNum; ++i)
+                        {
+                            saItemSpEffVal.add(String(kSummonDescpt[i].c_str()));
+                        }
+                        break;
+                    }
+                    combo_EffectVVal.addItemList(saItemSpEffVal, 1);
+                    break;
+                case Valid_10BaseRate:
+                    lbl_EffValTips.setText(UILC::Get_UI_Text(
+                        "cczWCA_Label_EffValTips_10Base"), dontSendNotification);
+                    break;
+                case Valid_Rate:
+                    lbl_EffValTips.setText(UILC::Get_UI_Text(
+                        "cczWCA_Label_EffValTips_Rate"), dontSendNotification);
+                    break;
+                case Valid_Integer:
+                    lbl_EffValTips.setText(UILC::Get_UI_Text(
+                        "cczWCA_Label_EffValTips_Integ"), dontSendNotification);
+                    break;
+                case Valid_NoValid:
+                default:
+                    break;
+                }
+                
+                tmpItemDetail.setItemSpEffct((byte)iprty);
             }
             else
             {
@@ -580,6 +644,7 @@ private:
     StringArray  saItemTypeSp;
     StringArray  saItemTypeUse;
     StringArray  saItemFitArmys;
+    StringArray  saItemSpEffVal;
     ClsItemDetail   tmpItemDetail;
 
 private:
@@ -607,6 +672,7 @@ private:
     Label       lbl_Price__Val;
     ComboBox    combo_EffectNVal;
     ComboBox    combo_EffectVVal;
+    Label       lbl_EffValTips;
     ComboBox    combo_TypeNamVal;
     Label       lbl_OriginVVal;
     Label       lbl_LvDelt_Val;

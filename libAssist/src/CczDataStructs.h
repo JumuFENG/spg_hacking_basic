@@ -29,6 +29,9 @@ const static int kItemSpTypeNum = 45;
 const static int kItemUseTypeNum = 14;
 const static std::wstring kItemProperUnknown = L"ÎÞ";
 const static int kArmyTypeNum = 27;
+const static int kFarAttackRangeNum = 16;
+const static int kMultiAttkRangeNum = 7;
+const static int kSummonNum = 4;
 
 const static unsigned long kItemsOffset = 0xA1140;
 const static int kItemsNum = 104;
@@ -120,10 +123,10 @@ const std::wstring kFarawayAttackDescpt[] =
     L"¹­±ø",
     L"åó±ø",
     L"Á¬åó±ø",
-    L"±¬Ñ×"
+    L"±¬Ñ×",
     L"Ã»Óð¼ý",
     L"ÅÚ³µ",
-    L"ÖØÅÚ³µ"
+    L"ÖØÅÚ³µ",
     L"¹­Æï±ø",
     L"È«ÆÁ",
     L"ÎÞ",
@@ -174,6 +177,13 @@ const std::wstring kArmyNamesDesc[] = {
     L"ÍÁÅ¼",
     L"»ÊµÛ",
     L"°ÙÐÕ"
+};
+
+const std::wstring kSummonDescpt[] = {
+    L"ÇàÁú",
+    L"ÖìÈ¸",
+    L"ÐþÎä",
+    L"°×»¢"
 };
 
 #pragma pack(1)
@@ -445,11 +455,23 @@ public:
         m_iType = (val & 2 == 0) ? Item_Normal : Item_Special;;
     }
 
+    void removeSpcialEff()
+    {
+        m_bySpEffect = -1;
+        m_bySpValue = 0;
+    }
+
     void setItemSpEffct(byte sp)
     {
-        assert (sp >= Ef_RenewHP && sp <= Use_UpArmLv);
         assert (m_iType != Item_Unknown);
-        m_bySpEffect = sp;
+        if (sp >= Ef_RenewHP && sp <= Use_UpArmLv)
+        {
+            m_bySpEffect = sp;
+        }
+        else
+        {
+            m_bySpEffect = -1;
+        }
     }
 
     void setItemSpecialEffValue(byte spval)
