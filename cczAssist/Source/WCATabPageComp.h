@@ -422,14 +422,20 @@ public:
         else if (comboBoxThatHasChanged == &combo_EffectNVal)
         {
             int selIdx = combo_EffectNVal.getSelectedItemIndex();
-            if (selIdx == kItemSpTypeNum)
+            bool bSpIsUse = radioItypeUseitm.getToggleState();
+            int cmbxItemNum = bSpIsUse ? kItemUseTypeNum : kItemSpTypeNum;
+            if (selIdx == cmbxItemNum)
             {
                 // 选择了“无”，取消特殊效果和值
                 tmpItemDetail.removeSpcialEff();
             }
-            else if (selIdx >= 0 && selIdx < kItemSpTypeNum)
+            else if (selIdx >= 0 && selIdx < cmbxItemNum)
             {
                 ItemProperty iprty = (ItemProperty)(selIdx + kItemNmTypeNum);
+                if (bSpIsUse)
+                {
+                    iprty = (ItemProperty)(iprty + kItemSpTypeNum);
+                }
                 String tips;
                 combo_EffectVVal.clear(dontSendNotification);
                 lbl_EffValTips.setText(String::empty, dontSendNotification);
@@ -601,6 +607,33 @@ public:
     }
 
 private:
+    void setSpcialEffVal()
+    {
+        byte sp = tmpItemDetail.getItemSpecial();
+        byte spVal = tmpItemDetail.getItemSpecialValue();
+        switch (ClsItemDetail::valueTypeOfSpEffect(sp))
+        {
+        case Valid_10BaseRate:
+        case Valid_Integer:
+        case Valid_NoValid:
+        case Valid_Rate:
+            combo_EffectVVal.setText(String(spVal));
+            break;
+        case Valid_Enums:
+            switch (sp)
+            {
+            case Ef_Summon:
+                combo_EffectVVal.setSelectedItemIndex(spVal - 64);
+                break;
+            case Ef_FarAtk:
+            case Ef_MultiAtk:
+                combo_EffectVVal.setSelectedItemIndex(spVal);
+                break;
+            }
+            break;
+        }
+    }
+
     void setUISpcialEffect()
     {
         if (tmpItemDetail.isNormalItem())
@@ -614,7 +647,8 @@ private:
         {
             radioItypeSpecia.setToggleState(true, sendNotification);
             combo_EffectNVal.setSelectedItemIndex(tmpItemDetail.getItemSpecial() - kItemNmTypeNum);
-            combo_EffectVVal.setText(String(tmpItemDetail.getItemSpecialValue()));
+            setSpcialEffVal();
+            combo_TypeNamVal.setSelectedItemIndex(tmpItemDetail.getItemType());
             lbl_OriginVVal.setText(String(tmpItemDetail.getItemOriginVal()), dontSendNotification);
             lbl_LvDelt_Val.setText(String(tmpItemDetail.getItemLvDelta()), dontSendNotification);
         }
@@ -623,7 +657,7 @@ private:
             radioItypeAssist.setToggleState(true, sendNotification);
             combo_EffectNVal.setSelectedItemIndex(
                 tmpItemDetail.getItemSpecial() - kItemNmTypeNum);
-            combo_EffectVVal.setText(String(tmpItemDetail.getItemSpecialValue())); // TODO:改为描述
+            setSpcialEffVal();
             byte ifit = tmpItemDetail.getAssistFitArmy() + 1;
             combo_TypeNamVal.setSelectedItemIndex( (0 <= ifit && ifit <= kArmyTypeNum + 1)
                 ? ifit : 0); // 适合兵种
@@ -633,9 +667,8 @@ private:
             radioItypeUseitm.setToggleState(true, sendNotification);
             combo_EffectNVal.setSelectedItemIndex(
                 tmpItemDetail.getItemSpecial() - kItemNmTypeNum - kItemSpTypeNum);
-            combo_EffectVVal.setText(String(tmpItemDetail.getItemSpecialValue())); // TODO:改为描述
+            combo_EffectVVal.setText(String(tmpItemDetail.getItemSpecialValue())); 
         }
-        
     }
 
 private:

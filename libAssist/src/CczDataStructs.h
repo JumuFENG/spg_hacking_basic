@@ -348,7 +348,7 @@ public:
         {
             if ( m_byType >= Nm_Sword && m_byType <= Sp_Suit)
             {
-                m_iType = (m_byType & 2 == 0) ? Item_Normal : Item_Special; 
+                m_iType = (m_byType % 2 == 0) ? Item_Normal : Item_Special; 
             }
             else
             {
@@ -396,7 +396,7 @@ public:
         byte tp = idtl.byType;
         if ( tp >= Nm_Sword && tp <= Sp_Suit)
         {
-            m_iType = (idtl.byType & 2 == 0) ? Item_Normal : Item_Special;
+            m_iType = (idtl.byType % 2 == 0) ? Item_Normal : Item_Special;
         }
         else
         {
@@ -452,7 +452,7 @@ public:
         // 武具才调用该接口，否则调用别的接口
         assert (val >= Nm_Sword && val <= Sp_Suit );
         m_byType = val;
-        m_iType = (val & 2 == 0) ? Item_Normal : Item_Special;;
+        m_iType = (val % 2 == 0) ? Item_Normal : Item_Special;;
     }
 
     void removeSpcialEff()
