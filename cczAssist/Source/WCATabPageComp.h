@@ -387,8 +387,8 @@ public:
         {
             ItemProperty selSp = (ItemProperty)(combo_EffectNVal.
                 getSelectedItemIndex() + kItemNmTypeNum);
-            int effVal = (Valid_Enums == ClsItemDetail::valueTypeOfSpEffect((byte)selSp)) ?
-                combo_EffectVVal.getSelectedItemIndex()
+            byte effVal = (Valid_Enums == ClsItemDetail::valueTypeOfSpEffect((byte)selSp)) ?
+                  combo_EffectVVal.getSelectedItemIndex()
                 : combo_EffectVVal.getText().getIntValue();
             if (selSp == Ef_Summon)
             {
@@ -408,9 +408,14 @@ public:
         else if (comboBoxThatHasChanged == &combo_TypeNamVal)
         {
             int selIdx = combo_TypeNamVal.getSelectedItemIndex();
-            if (selIdx >= 0 && selIdx < 18)
+            if (selIdx >= 0 && selIdx < 18 && 
+                (tmpItemDetail.isNormalItem() || tmpItemDetail.isSpecialItem()))
             {
                 tmpItemDetail.setItemTypeValue(selIdx);
+            }
+            else if (selIdx >= 0 && selIdx < kArmyTypeNum && tmpItemDetail.isAssistItem())
+            {
+                tmpItemDetail.setFitArmyType(selIdx);
             }
             else
             {
@@ -646,7 +651,8 @@ private:
         else if (tmpItemDetail.isSpecialItem())
         {
             radioItypeSpecia.setToggleState(true, sendNotification);
-            combo_EffectNVal.setSelectedItemIndex(tmpItemDetail.getItemSpecial() - kItemNmTypeNum);
+            combo_EffectNVal.setSelectedItemIndex(tmpItemDetail.getItemSpecial() - kItemNmTypeNum,
+                sendNotificationSync);
             setSpcialEffVal();
             combo_TypeNamVal.setSelectedItemIndex(tmpItemDetail.getItemType());
             lbl_OriginVVal.setText(String(tmpItemDetail.getItemOriginVal()), dontSendNotification);
@@ -656,7 +662,8 @@ private:
         {
             radioItypeAssist.setToggleState(true, sendNotification);
             combo_EffectNVal.setSelectedItemIndex(
-                tmpItemDetail.getItemSpecial() - kItemNmTypeNum);
+                tmpItemDetail.getItemSpecial() - kItemNmTypeNum,
+                sendNotificationSync);
             setSpcialEffVal();
             byte ifit = tmpItemDetail.getAssistFitArmy() + 1;
             combo_TypeNamVal.setSelectedItemIndex( (0 <= ifit && ifit <= kArmyTypeNum + 1)
@@ -666,7 +673,8 @@ private:
         {
             radioItypeUseitm.setToggleState(true, sendNotification);
             combo_EffectNVal.setSelectedItemIndex(
-                tmpItemDetail.getItemSpecial() - kItemNmTypeNum - kItemSpTypeNum);
+                tmpItemDetail.getItemSpecial() - kItemNmTypeNum - kItemSpTypeNum,
+                sendNotificationSync);
             combo_EffectVVal.setText(String(tmpItemDetail.getItemSpecialValue())); 
         }
     }
