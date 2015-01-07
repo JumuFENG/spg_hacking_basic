@@ -90,16 +90,18 @@ public:
         if (rowIsSelected)
             g.fillAll (findColour (TextEditor::highlightColourId));
 
-        ItemDetail id = items[rowNumber];
-        std::vector<char> szName;
-        for (int i = 0; i < 17; ++i)
+        if (rowNumber < items.size())
         {
-            szName.push_back(id.szName[i]);
+            ItemDetail id = items[rowNumber];
+            std::vector<char> szName;
+            for (int i = 0; i < 17; ++i)
+            {
+                szName.push_back(id.szName[i]);
+            }
+            g.drawText(InputStringConverter::ConvertGBKToUtf8Str(szName), 
+                juce::Rectangle<float>(1.0, 1.0, width, height),
+                Justification::centredLeft);
         }
-        g.drawText(InputStringConverter::ConvertGBKToUtf8Str(szName), 
-            juce::Rectangle<float>(1.0, 1.0, width, height),
-            Justification::centredLeft);
-        
     }
 
     void setListListener(WCAListListener* wcaLln)
@@ -111,6 +113,20 @@ private:
     void getItems(bool bRepeat = false)
     {
         items = cczAssistLibLoader::getInstance()->GetCczItems(bRepeat);
+//         if (items.empty())
+//         {
+//             ItemDetail id;
+//             memcpy(id.szName, "Test", 17);
+//             id.bIsSpItem = true;
+//             id.byAstSpEff = Ef_FarAtk;
+//             id.byAstSpValue = 6;
+//             id.byAstFitArmy = 7;
+//             id.byPrice = 255;
+//             id.byIcon = 55;
+//             id.byAst21ph = 255;
+//             id.byAst23ph = 0;
+//             items.push_back(id);
+//         }
     }
 
 private:
@@ -131,11 +147,6 @@ public:
     //==============================================================================
     WCATabPageComp()
     {
-        lstModel.setListListener(this);
-        lstWCA.setModel(&lstModel);
-        lstWCA.setMultipleSelectionEnabled(false);
-        lstWCA.selectRow(0);
-
         radioItypeNormal.setButtonText(UILC::Get_UI_Text("cczWCA_Radio_itype_Normal"));
         radioItypeSpecia.setButtonText(UILC::Get_UI_Text("cczWCA_Radio_itype_Specia"));
         radioItypeAssist.setButtonText(UILC::Get_UI_Text("cczWCA_Radio_itype_Assist"));
@@ -231,6 +242,11 @@ public:
         combo_EffectVVal.addListener(this);
         combo_TypeNamVal.addListener(this);
 
+        lstModel.setListListener(this);
+        lstWCA.setModel(&lstModel);
+        lstWCA.setMultipleSelectionEnabled(false);
+        lstWCA.selectRow(0);
+
         UILC::Set_Comp_Size(&lbl_WCANam_Val, "UL_WCA_lbl_WCANam_Val");
         UILC::Set_Comp_Size(&lbl_PicNum_Val, "UL_WCA_lbl_PicNum_Val");
         UILC::Set_Comp_Size(&lbl_Price__Val, "UL_WCA_lbl_Price__Val");
@@ -256,9 +272,6 @@ public:
         addAndMakeVisible(lbl_Price);
         addAndMakeVisible(lbl_EffectName);
         addAndMakeVisible(lbl_EffectVal);
-        addAndMakeVisible(lbl_TypeName);
-        addAndMakeVisible(lbl_OriginVal);
-        addAndMakeVisible(lbl_LvDelta);
 
         addAndMakeVisible(lbl_WCANam_Val);
         addAndMakeVisible(lbl_PicNum_Val);
@@ -266,9 +279,6 @@ public:
         addAndMakeVisible(combo_EffectNVal);
         addAndMakeVisible(combo_EffectVVal);
         addAndMakeVisible(lbl_EffValTips);
-        addAndMakeVisible(combo_TypeNamVal);
-        addAndMakeVisible(lbl_OriginVVal);
-        addAndMakeVisible(lbl_LvDelt_Val);
 
         addAndMakeVisible(btn_WriteCurSel);
     }
@@ -408,14 +418,16 @@ public:
         else if (comboBoxThatHasChanged == &combo_TypeNamVal)
         {
             int selIdx = combo_TypeNamVal.getSelectedItemIndex();
-            if (selIdx >= 0 && selIdx < 18 && 
-                (tmpItemDetail.isNormalItem() || tmpItemDetail.isSpecialItem()))
+            if (selIdx >= 0 && selIdx < combo_TypeNamVal.getNumItems() )
             {
-                tmpItemDetail.setItemTypeValue(selIdx);
-            }
-            else if (selIdx >= 0 && selIdx < kArmyTypeNum && tmpItemDetail.isAssistItem())
-            {
-                tmpItemDetail.setFitArmyType(selIdx);
+                if (tmpItemDetail.isNormalItem() || tmpItemDetail.isSpecialItem())
+                {
+                    tmpItemDetail.setItemTypeValue(selIdx);
+                }
+                else if (tmpItemDetail.isAssistItem())
+                {
+                    tmpItemDetail.setFitArmyType((byte)selIdx - 1);
+                }
             }
             else
             {
@@ -428,13 +440,12 @@ public:
         {
             int selIdx = combo_EffectNVal.getSelectedItemIndex();
             bool bSpIsUse = radioItypeUseitm.getToggleState();
-            int cmbxItemNum = bSpIsUse ? kItemUseTypeNum : kItemSpTypeNum;
-            if (selIdx == cmbxItemNum)
+            if (selIdx == combo_EffectNVal.getNumItems() - 1)
             {
                 // 选择了“无”，取消特殊效果和值
                 tmpItemDetail.removeSpcialEff();
             }
-            else if (selIdx >= 0 && selIdx < cmbxItemNum)
+            else if (selIdx >= 0 && selIdx < combo_EffectNVal.getNumItems())
             {
                 ItemProperty iprty = (ItemProperty)(selIdx + kItemNmTypeNum);
                 if (bSpIsUse)
@@ -517,64 +528,61 @@ public:
             cczAssistLibLoader::getInstance()->WriteItemToCcz(
                 lstWCA.getSelectedRow(), tmpItemDetail.getItemDetailPure());
         }
-    }
-
-    void buttonStateChanged (Button* btnChangeState)
-    {
-        if (!btnChangeState->getToggleState())
+        else if (btnThatClicked->getToggleState() && btnThatClicked != lastSelectedRadioBtn)
         {
-            return;
-        }
-        if (btnChangeState == &radioItypeNormal || btnChangeState == &radioItypeSpecia)
-        {
-            if (btnChangeState == &radioItypeNormal)
+            lastSelectedRadioBtn = btnThatClicked;
+            if (btnThatClicked == &radioItypeNormal || btnThatClicked == &radioItypeSpecia)
             {
-                combo_EffectNVal.setSelectedItemIndex(combo_EffectNVal.getNumItems());
-                combo_EffectVVal.setSelectedId(-1);
-                combo_EffectVVal.setEnabled(false);
+                if (btnThatClicked == &radioItypeNormal)
+                {
+                    combo_EffectNVal.setSelectedItemIndex(combo_EffectNVal.getNumItems());
+                    combo_EffectVVal.setSelectedId(-1);
+                    combo_EffectVVal.setEnabled(false);
+                }
+                else
+                {
+                    combo_EffectVVal.setEnabled(true);
+                }
+                lbl_TypeName.setText(UILC::Get_UI_Text("cczWCA_Label_TypeName"), dontSendNotification);
+                combo_TypeNamVal.clear();
+                combo_TypeNamVal.addItemList(saItemTypeNm, 1);
+                addAndMakeVisible(lbl_OriginVal);
+                addAndMakeVisible(lbl_OriginVVal);
+                addAndMakeVisible(lbl_LvDelta);
+                addAndMakeVisible(lbl_LvDelt_Val);
+            }
+            else if (btnThatClicked == &radioItypeAssist || btnThatClicked == &radioItypeUseitm)
+            {
+                combo_EffectVVal.setEnabled(true);
+                lbl_OriginVal.setVisible(false);
+                lbl_OriginVVal.setVisible(false);
+                lbl_LvDelta.setVisible(false);
+                lbl_LvDelt_Val.setVisible(false);
+                tmpItemDetail.changeToAssist();
+                if (btnThatClicked == &radioItypeAssist)
+                {
+                    lbl_TypeName.setText(UILC::Get_UI_Text("cczWCA_Label_FitArmy"), dontSendNotification);
+                    combo_TypeNamVal.clear();
+                    combo_TypeNamVal.addItemList(saItemFitArmys, 1);
+                }
+                else if (btnThatClicked == &radioItypeUseitm)
+                {
+                    lbl_TypeName.setVisible(false);
+                    combo_TypeNamVal.setVisible(false);
+                }
+            }
+            if (btnThatClicked == &radioItypeUseitm)
+            {
+                combo_EffectNVal.clear();
+                combo_EffectNVal.addItemList(saItemTypeUse, 1);
             }
             else
             {
-                combo_EffectVVal.setEnabled(true);
+                combo_EffectNVal.clear();
+                combo_EffectNVal.addItemList(saItemTypeSp, 1);
+                addAndMakeVisible(lbl_TypeName);
+                addAndMakeVisible(combo_TypeNamVal);
             }
-            lbl_TypeName.setText(UILC::Get_UI_Text("cczWCA_Label_TypeName"), dontSendNotification);
-            combo_TypeNamVal.clear();
-            combo_TypeNamVal.addItemList(saItemTypeNm, 1);
-            lbl_OriginVal.setVisible(true);
-            lbl_OriginVVal.setVisible(true);
-            lbl_LvDelta.setVisible(true);
-            lbl_LvDelt_Val.setVisible(true);
-        }
-        else
-        {
-            combo_EffectVVal.setEnabled(true);
-            lbl_OriginVal.setVisible(false);
-            lbl_OriginVVal.setVisible(false);
-            lbl_LvDelta.setVisible(false);
-            lbl_LvDelt_Val.setVisible(false);
-            if (btnChangeState == &radioItypeAssist)
-            {
-                lbl_TypeName.setText(UILC::Get_UI_Text("cczWCA_Label_FitArmy"), dontSendNotification);
-                combo_TypeNamVal.clear();
-                combo_TypeNamVal.addItemList(saItemFitArmys, 1);
-            }
-            else if (btnChangeState == &radioItypeUseitm)
-            {
-                lbl_TypeName.setVisible(false);
-                combo_TypeNamVal.setVisible(false);
-            }
-        }
-        if (btnChangeState == &radioItypeUseitm)
-        {
-            combo_EffectNVal.clear();
-            combo_EffectNVal.addItemList(saItemTypeUse, 1);
-        }
-        else
-        {
-            combo_EffectNVal.clear();
-            combo_EffectNVal.addItemList(saItemTypeSp, 1);
-            lbl_TypeName.setVisible(true);
-            combo_TypeNamVal.setVisible(true);
         }
     }
 
@@ -643,14 +651,22 @@ private:
     {
         if (tmpItemDetail.isNormalItem())
         {
-            radioItypeNormal.setToggleState(true, sendNotification);
+            if (lastSelectedRadioBtn != &radioItypeNormal)
+            {
+                radioItypeNormal.setToggleState(true, dontSendNotification);
+                buttonClicked(&radioItypeNormal);
+            }
             combo_TypeNamVal.setSelectedItemIndex(tmpItemDetail.getItemType());
             lbl_OriginVVal.setText(String(tmpItemDetail.getItemOriginVal()), dontSendNotification);
             lbl_LvDelt_Val.setText(String(tmpItemDetail.getItemLvDelta()), dontSendNotification);
         }
         else if (tmpItemDetail.isSpecialItem())
         {
-            radioItypeSpecia.setToggleState(true, sendNotification);
+            if (lastSelectedRadioBtn != &radioItypeSpecia)
+            {
+                radioItypeSpecia.setToggleState(true, dontSendNotification);
+                buttonClicked(&radioItypeSpecia);
+            }
             combo_EffectNVal.setSelectedItemIndex(tmpItemDetail.getItemSpecial() - kItemNmTypeNum,
                 sendNotificationSync);
             setSpcialEffVal();
@@ -660,7 +676,11 @@ private:
         }
         else if (tmpItemDetail.isAssistItem())
         {
-            radioItypeAssist.setToggleState(true, sendNotification);
+            if (lastSelectedRadioBtn != &radioItypeAssist)
+            {
+                radioItypeAssist.setToggleState(true, dontSendNotification);
+                buttonClicked(&radioItypeAssist);
+            }
             combo_EffectNVal.setSelectedItemIndex(
                 tmpItemDetail.getItemSpecial() - kItemNmTypeNum,
                 sendNotificationSync);
@@ -671,7 +691,11 @@ private:
         }
         else if (tmpItemDetail.isAstUseItem())
         {
-            radioItypeUseitm.setToggleState(true, sendNotification);
+            if (lastSelectedRadioBtn != &radioItypeUseitm)
+            {
+                radioItypeUseitm.setToggleState(true, dontSendNotification);
+                buttonClicked(&radioItypeUseitm);
+            }
             combo_EffectNVal.setSelectedItemIndex(
                 tmpItemDetail.getItemSpecial() - kItemNmTypeNum - kItemSpTypeNum,
                 sendNotificationSync);
@@ -687,6 +711,7 @@ private:
     StringArray  saItemFitArmys;
     StringArray  saItemSpEffVal;
     ClsItemDetail   tmpItemDetail;
+    Button* lastSelectedRadioBtn;
 
 private:
     LookAndFeel_V3 lookfellv3;

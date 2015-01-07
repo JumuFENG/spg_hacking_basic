@@ -484,7 +484,7 @@ public:
     void setItemOriginVal(byte val) { m_byLvOne = val; }
     void setIsSpecialItem(bool isp) { m_bIsSpecial = isp; }
     void setIconPicId(byte icid){ m_byIcon = icid; }
-    void setLvDeltaVal(bool val){ m_byLvInc = val; }
+    void setLvDeltaVal(byte val){ m_byLvInc = val; }
     void setFitArmyType(byte val){ setLvDeltaVal(val); }
     const char* getItemName() { return m_szName; }
     byte getItemIcon() { return m_byIcon; }
