@@ -57,7 +57,7 @@ public:
 
     ItemDetail getItemDetail(int rowNum)
     {
-        return items.at(rowNum);
+        return itemsModified.at(rowNum).getItemDetailPure();
     }
 
     void setModify(int rowNum, const ClsItemDetail& idtl )
@@ -127,6 +127,11 @@ private:
 //             id.byAst23ph = 0;
 //             items.push_back(id);
 //         }
+        for (std::vector<ItemDetail>::iterator it = items.begin();
+            it != items.end(); ++it)
+        {
+            itemsModified.push_back(ClsItemDetail(*it));
+        }
     }
 
 private:
