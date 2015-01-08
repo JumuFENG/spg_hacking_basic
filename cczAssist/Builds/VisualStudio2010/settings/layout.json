@@ -57,5 +57,10 @@
 
   "UL_WCA_btn_Write_Cur":"350 050 70 25",
 
+  "UL_SavePanel_chkbx_StartupEvalid":"350 050 70 25",
+  "UL_SavePanel_btn_WriteIn":"350 050 70 25",
+  "UL_SavePanel_btn_Restore":"350 050 70 25",
+  "UL_SavePanel_btn_Refresh":"350 050 70 25",
+
   "a":"b"
 }

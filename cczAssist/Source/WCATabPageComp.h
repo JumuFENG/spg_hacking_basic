@@ -13,6 +13,7 @@
 #include "cczAssistLibLoader.h"
 #include "InputStringConverter.h"
 #include "memModRecComp.h"
+#include "SaveControlPanelComp.h"
 
 namespace UILC = UILayoutConverter;
 

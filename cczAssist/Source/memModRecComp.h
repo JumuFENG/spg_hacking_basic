@@ -32,6 +32,10 @@ public:
     UserRecordApplyComp()
         : bDeleted(false)
     {
+        btn_Apply.setButtonText(cczAssistLanguageSetting::getInstance()->getUIText(
+            String("cczAssistMain_Text_Apply")));
+        btn_Restore.setButtonText(cczAssistLanguageSetting::getInstance()->getUIText(
+            String("cczAssistMain_Text_Restore")));
         Set_Comp_Size(&chkbx_Name, "UL_Rcd_NameChkbx_Rect");
         Set_Comp_Size(&btn_Apply, "UL_Rcd_Applybtn_Rect");
         Set_Comp_Size(&btn_Restore, "UL_Rcd_Restorebtn_Rect");
@@ -94,10 +98,6 @@ public:
         Set_Comp_Pos(&chkbx_Name, "UL_Rcd_NameChkbx_Rect");
         Set_Comp_Pos(&btn_Apply, "UL_Rcd_Applybtn_Rect");
         Set_Comp_Pos(&btn_Restore, "UL_Rcd_Restorebtn_Rect");
-        btn_Apply.setButtonText(cczAssistLanguageSetting::getInstance()->getUIText(
-            String("cczAssistMain_Text_Apply")));
-        btn_Restore.setButtonText(cczAssistLanguageSetting::getInstance()->getUIText(
-            String("cczAssistMain_Text_Restore")));
     }
 
     void mouseUp (const MouseEvent& mevt)
@@ -176,7 +176,7 @@ private:
     bool              bEnableWhenStart;
     String            udName;     //user defined name
     unsigned long     offset;
-    std::vector<byte> usBytes;    // usser set bytes
+    std::vector<byte> usBytes;    // user set bytes
     std::vector<byte> oldBytes;
     bool              bDeleted;
 

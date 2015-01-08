@@ -16,10 +16,14 @@
   "cczAssistMain_Label_UserModRecd":"修改记录",
   "cczAssistMain_Text_Apply":"应用",
   "cczAssistMain_Text_Restore":"恢复",
+  "cczAssistMain_Text_Refresh":"刷新",
   "cczAssistMain_Text_SelectAll":"全选",
   "cczAssistMain_Text_Delete":"删除",
   "cczAssistMain_Text_Save": "保存",
   "cczAssistMain_Text_WriteIn": "写入",
+
+  "cczSavePanel_chkbx_StartupEvalid": "启动时生效",
+
 
   "cczWCA_Radio_itype_Normal":"普通武具",
   "cczWCA_Radio_itype_Specia":"特殊武具",
