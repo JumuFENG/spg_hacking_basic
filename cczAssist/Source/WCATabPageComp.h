@@ -145,13 +145,14 @@ class WCATabPageComp   : public Component
     , public LabelListener
     , public ComboBoxListener
     , public ButtonListener
+    , public SavePanelListener
     , public TextEditorListener
     , public WCAListListener
     , public ChangeListener
 {
 public:
     //==============================================================================
-    WCATabPageComp()
+    WCATabPageComp() : svpnl_WriteCurSel(SaveControlPanelComp::SPD_Vertical)
     {
         radioItypeNormal.setButtonText(UILC::Get_UI_Text("cczWCA_Radio_itype_Normal"));
         radioItypeSpecia.setButtonText(UILC::Get_UI_Text("cczWCA_Radio_itype_Specia"));
@@ -263,9 +264,8 @@ public:
         UILC::Set_Comp_Size(&lbl_OriginVVal, "UL_WCA_lbl_OriginVVal");
         UILC::Set_Comp_Size(&lbl_LvDelt_Val, "UL_WCA_lbl_LvDelt_Val");
 
-        btn_WriteCurSel.setButtonText(UILC::Get_UI_Text("cczAssistMain_Text_WriteIn"));
-        btn_WriteCurSel.addListener(this);
-        UILC::Set_Comp_Size(&btn_WriteCurSel, "UL_WCA_btn_Write_Cur");
+        svpnl_WriteCurSel.setSavePanelListener(this);
+        UILC::Set_Comp_Size(&svpnl_WriteCurSel, "UL_WCA_SavePanel_Cur");
 
         addAndMakeVisible(radioItypeNormal);
         addAndMakeVisible(radioItypeSpecia);
@@ -286,7 +286,7 @@ public:
         addAndMakeVisible(combo_EffectVVal);
         addAndMakeVisible(lbl_EffValTips);
 
-        addAndMakeVisible(btn_WriteCurSel);
+        addAndMakeVisible(svpnl_WriteCurSel);
     }
 
     ~WCATabPageComp()
@@ -332,7 +332,7 @@ public:
         UILC::Set_Comp_Pos(&lbl_OriginVVal, "UL_WCA_lbl_OriginVVal");
         UILC::Set_Comp_Pos(&lbl_LvDelt_Val, "UL_WCA_lbl_LvDelt_Val");
 
-        UILC::Set_Comp_Pos(&btn_WriteCurSel, "UL_WCA_btn_Write_Cur");
+        UILC::Set_Comp_Pos(&svpnl_WriteCurSel, "UL_WCA_SavePanel_Cur");
     }
 
     void initData()
@@ -529,12 +529,7 @@ public:
 
     void buttonClicked(Button* btnThatClicked)
     {
-        if (btnThatClicked == &btn_WriteCurSel)
-        {
-            cczAssistLibLoader::getInstance()->WriteItemToCcz(
-                lstWCA.getSelectedRow(), tmpItemDetail.getItemDetailPure());
-        }
-        else if (btnThatClicked->getToggleState() && btnThatClicked != lastSelectedRadioBtn)
+        if (btnThatClicked->getToggleState() && btnThatClicked != lastSelectedRadioBtn)
         {
             lastSelectedRadioBtn = btnThatClicked;
             if (btnThatClicked == &radioItypeNormal || btnThatClicked == &radioItypeSpecia)
@@ -709,6 +704,22 @@ private:
         }
     }
 
+    void OnSavePanelWrite()
+    {
+        cczAssistLibLoader::getInstance()->WriteItemToCcz(
+            lstWCA.getSelectedRow(), tmpItemDetail.getItemDetailPure());
+    }
+
+    void OnSavePanelRestore()
+    {
+
+    }
+
+    void OnSavePanelRefresh()
+    {
+
+    }
+
 private:
     int          ITypeRadioGroupId;
     StringArray  saItemTypeNm;
@@ -749,7 +760,7 @@ private:
     Label       lbl_OriginVVal;
     Label       lbl_LvDelt_Val;
 
-    TextButton  btn_WriteCurSel;
+    SaveControlPanelComp  svpnl_WriteCurSel;
 
 private:
     //==============================================================================

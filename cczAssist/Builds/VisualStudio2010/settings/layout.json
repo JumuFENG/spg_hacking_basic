@@ -55,12 +55,15 @@
   "UL_WCA_lbl_OriginVVal":"210 230 30 25",
   "UL_WCA_lbl_LvDelt_Val":"210 260 30 25",
 
-  "UL_WCA_btn_Write_Cur":"350 050 70 25",
-
-  "UL_SavePanel_chkbx_StartupEvalid":"350 050 70 25",
-  "UL_SavePanel_btn_WriteIn":"350 050 70 25",
-  "UL_SavePanel_btn_Restore":"350 050 70 25",
-  "UL_SavePanel_btn_Refresh":"350 050 70 25",
+  "UL_WCA_SavePanel_Cur":"350 050 100 145",
+  "UL_SavePanel_chkbx_StartupEvalid":"0 0 90 25",
+  "UL_SavePanel_btn_WriteIn":"0 030 70 25",
+  "UL_SavePanel_btn_Restore":"0 060 70 25",
+  "UL_SavePanel_btn_Refresh":"0 090 70 25",
+  "UL_SavePanel_chkbx_StartupEvalid_H":"0 0 90 25",
+  "UL_SavePanel_btn_WriteIn_H":"110 0 70 25",
+  "UL_SavePanel_btn_Restore_H":"190 0 70 25",
+  "UL_SavePanel_btn_Refresh_H":"270 0 70 25",
 
   "a":"b"
 }

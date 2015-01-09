@@ -26,9 +26,13 @@ class SaveControlPanelComp
     : public Component
     , public ButtonListener
 {
+public:    
+    enum SavePanelDirection{ SPD_Vertical, SPD_Horizion};
+
 public:
-    SaveControlPanelComp()
+    SaveControlPanelComp(SavePanelDirection sd = SPD_Vertical)
         : bSetWhenStartup(false)
+        , spdDirection(sd)
         , spListener(nullptr)
     {
         btn_WriteIn.setButtonText(Get_UI_Text("cczAssistMain_Text_WriteIn"));
@@ -39,10 +43,20 @@ public:
         btn_Restore.addListener(this);
         btn_Refresh.addListener(this);
         chkbx_SetWhenStartup.addListener(this);
-        Set_Comp_Size(&btn_WriteIn, "UL_SavePanel_btn_WriteIn");
-        Set_Comp_Size(&btn_Restore, "UL_SavePanel_btn_Restore");
-        Set_Comp_Size(&btn_Refresh, "UL_SavePanel_btn_Refresh");
-        Set_Comp_Size(&chkbx_SetWhenStartup, "UL_SavePanel_chkbx_StartupEvalid");
+        if (spdDirection == SPD_Vertical)
+        {
+            Set_Comp_Size(&btn_WriteIn, "UL_SavePanel_btn_WriteIn");
+            Set_Comp_Size(&btn_Restore, "UL_SavePanel_btn_Restore");
+            Set_Comp_Size(&btn_Refresh, "UL_SavePanel_btn_Refresh");
+            Set_Comp_Size(&chkbx_SetWhenStartup, "UL_SavePanel_chkbx_StartupEvalid");
+        }
+        else
+        {
+            Set_Comp_Size(&btn_WriteIn, "UL_SavePanel_btn_WriteIn_H");
+            Set_Comp_Size(&btn_Restore, "UL_SavePanel_btn_Restore_H");
+            Set_Comp_Size(&btn_Refresh, "UL_SavePanel_btn_Refresh_H");
+            Set_Comp_Size(&chkbx_SetWhenStartup, "UL_SavePanel_chkbx_StartupEvalid_H");
+        }
 
         addAndMakeVisible(btn_WriteIn);
         addAndMakeVisible(btn_Restore);
@@ -59,10 +73,20 @@ public:
 
     void resized()
     {
-        Set_Comp_Pos(&btn_WriteIn, "UL_SavePanel_btn_WriteIn");
-        Set_Comp_Pos(&btn_Restore, "UL_SavePanel_btn_Restore");
-        Set_Comp_Pos(&btn_Refresh, "UL_SavePanel_btn_Refresh");
-        Set_Comp_Pos(&chkbx_SetWhenStartup, "UL_SavePanel_chkbx_StartupEvalid");
+        if (spdDirection == SPD_Vertical)
+        {
+            Set_Comp_Pos(&chkbx_SetWhenStartup, "UL_SavePanel_chkbx_StartupEvalid");
+            Set_Comp_Pos(&btn_WriteIn, "UL_SavePanel_btn_WriteIn");
+            Set_Comp_Pos(&btn_Restore, "UL_SavePanel_btn_Restore");
+            Set_Comp_Pos(&btn_Refresh, "UL_SavePanel_btn_Refresh");
+        }
+        else
+        {
+            Set_Comp_Pos(&chkbx_SetWhenStartup, "UL_SavePanel_chkbx_StartupEvalid_H");
+            Set_Comp_Pos(&btn_WriteIn, "UL_SavePanel_btn_WriteIn_H");
+            Set_Comp_Pos(&btn_Restore, "UL_SavePanel_btn_Restore_H");
+            Set_Comp_Pos(&btn_Refresh, "UL_SavePanel_btn_Refresh_H");
+        }
     }
 
     void buttonClicked(Button* btnThatClicked)
@@ -103,11 +127,14 @@ public:
     void setSavePanelListener(SavePanelListener* p) { spListener = p; }
 
 private:
+    bool                bSetWhenStartup;
+    SavePanelDirection  spdDirection;
+
+private:
     ToggleButton        chkbx_SetWhenStartup;
     TextButton          btn_WriteIn;
     TextButton          btn_Restore;
     TextButton          btn_Refresh;
-    bool                bSetWhenStartup;
     SavePanelListener*  spListener;
 
 private:
