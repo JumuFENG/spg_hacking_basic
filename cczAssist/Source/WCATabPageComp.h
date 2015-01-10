@@ -12,7 +12,6 @@
 #include "cczAssistConfig.h"
 #include "cczAssistLibLoader.h"
 #include "InputStringConverter.h"
-#include "memModRecComp.h"
 #include "SaveControlPanelComp.h"
 
 namespace UILC = UILayoutConverter;
@@ -137,6 +136,30 @@ private:
             it != items.end(); ++it)
         {
             itemsModified.push_back(ClsItemDetail(*it));
+        }
+
+        var varItemsModified = cczAssistAppConfig::getInstance()->getItemModified();
+        if (varItemsModified.isArray())
+        {
+            for (int i = 0; i < varItemsModified.size(); ++i)
+            {
+                DynamicObject* dobj = varItemsModified[i].getDynamicObject();
+                if (dobj->getProperty("AutoEnable"))
+                {
+                    int idx = dobj->getProperty("ItemIdx");
+                    String bytes = dobj->getProperty("Bytes");
+                    std::vector<byte> vecBts = InputStringConverter::convertinputbytes(bytes);
+                    if (itemsModified.size() > idx && !vecBts.empty())
+                    {
+                        ItemDetail idtmp = itemsModified.at(idx).getItemDetailPure();
+                        memcpy((byte*)&idtmp + 17, &vecBts[0], sizeof(ItemDetail) - 17);
+                        ClsItemDetail clsIdtmp(idtmp);
+                        clsIdtmp.setStartupEvalid(true);
+                        setModify(idx, clsIdtmp);
+                        cczAssistLibLoader::getInstance()->WriteItemToCcz(idx, idtmp);
+                    }
+                }
+            }
         }
     }
 
@@ -616,6 +639,7 @@ public:
         {
             Sleep(3000);
             initData();
+            lstWCA.selectRow(0);
         }
     }
 
@@ -710,10 +734,20 @@ private:
         }
     }
 
+    void OnEvalidCheckedChange(bool bChecked)
+    {
+        tmpItemDetail.setStartupEvalid(bChecked);
+        cczAssistAppConfig::getInstance()->setItemModifiedAutoEnable(
+            lstWCA.getSelectedRow(), bChecked);
+    }
+
     void OnSavePanelWrite()
     {
         cczAssistLibLoader::getInstance()->WriteItemToCcz(
             lstWCA.getSelectedRow(), tmpItemDetail.getItemDetailPure());
+        tmpItemDetail.setStartupEvalid(svpnl_WriteCurSel.isSetWhenStartUp());
+        cczAssistAppConfig::getInstance()->setItemModified(lstWCA.getSelectedRow(),
+            tmpItemDetail.getItemDetailString(), tmpItemDetail.isStartupEvalid());
     }
 
     void OnSavePanelRestore()

@@ -31,7 +31,7 @@ public:
 
 public:
     SaveControlPanelComp(SavePanelDirection sd = SPD_Vertical)
-        : bSetWhenStartup(false)
+        : bSetWhenStartup(true)
         , spdDirection(sd)
         , spListener(nullptr)
     {
@@ -39,6 +39,7 @@ public:
         btn_Restore.setButtonText(Get_UI_Text("cczAssistMain_Text_Restore"));
         btn_Refresh.setButtonText(Get_UI_Text("cczAssistMain_Text_Refresh"));
         chkbx_SetWhenStartup.setButtonText(Get_UI_Text("cczSavePanel_chkbx_StartupEvalid"));
+        chkbx_SetWhenStartup.setToggleState(true, sendNotification);
         btn_WriteIn.addListener(this);
         btn_Restore.addListener(this);
         btn_Refresh.addListener(this);
@@ -94,6 +95,10 @@ public:
         if (btnThatClicked == &chkbx_SetWhenStartup)
         {
             setWhenStartUp(chkbx_SetWhenStartup.getToggleState());
+            if (spListener != nullptr)
+            {
+                spListener->OnEvalidCheckedChange(chkbx_SetWhenStartup.getToggleState());
+            }
         }
         else if (spListener != nullptr)
         {
@@ -122,6 +127,7 @@ public:
         virtual void OnSavePanelWrite() = 0;
         virtual void OnSavePanelRestore() = 0;
         virtual void OnSavePanelRefresh() = 0;
+        virtual void OnEvalidCheckedChange(bool) = 0;
     };
 
     void setSavePanelListener(SavePanelListener* p) { spListener = p; }

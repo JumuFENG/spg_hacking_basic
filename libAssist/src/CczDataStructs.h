@@ -327,12 +327,12 @@ enum CczValidSpEffVal{
 
 class ClsItemDetail{
 public:
-    ClsItemDetail()
+    ClsItemDetail() : m_bEvalidOnStart(false)
     {
 
     }
 
-    ClsItemDetail(const ItemDetail& idtl)
+    ClsItemDetail(const ItemDetail& idtl) : m_bEvalidOnStart(false)
     {
         setItemDetail(idtl);
     }
@@ -384,6 +384,13 @@ public:
             rtIdtl.byAst23ph = 0x00;
         }
         return rtIdtl;
+    }
+
+    String getItemDetailString()
+    {
+        ItemDetail idtl = getItemDetailPure();
+        byte* pIdtl = (byte*)(&idtl);
+        return String::toHexString(pIdtl + 17, sizeof(ItemDetail) - 17, 1);
     }
 
     void setItemDetail(ItemDetail idtl)
@@ -496,6 +503,9 @@ public:
     byte getItemLvDelta() { return m_byLvInc; }
     byte getAssistFitArmy() { return m_byLvInc; }
 
+    bool isStartupEvalid() { return m_bEvalidOnStart; }
+    void setStartupEvalid(bool bEvalid) { m_bEvalidOnStart = bEvalid; }
+
     bool isNormalItem(){ return m_iType == Item_Normal; }
     bool isSpecialItem() {return m_iType == Item_Special; }
     bool isAssistItem() { return m_iType == Item_Assist; }
@@ -582,6 +592,7 @@ private:
     byte    m_byLvInc;      // 升级成长值，辅助表示适合兵种
     bool    m_bIsSpecial;
     CczItemType m_iType;
+    bool    m_bEvalidOnStart;
 };
 
 #endif // CCZ_ASSIST_DATASTRUCTURE_INCLUDE_H

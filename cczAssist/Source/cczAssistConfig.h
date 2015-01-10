@@ -82,6 +82,7 @@ public:
             varAppConfig = JSON::parse("{}");
         }
         varUserAddedItems = varAppConfig["UserAdded"];
+        varItemsModified = varAppConfig["ItemsModified"];
     }
 
     ~cczAssistAppConfig()
@@ -94,6 +95,7 @@ public:
     void saveConfig()
     {
         varAppConfig.getDynamicObject()->setProperty("UserAdded", varUserAddedItems);
+        varAppConfig.getDynamicObject()->setProperty("ItemsModified", varItemsModified);
         fappcofig.replaceWithText(JSON::toString(varAppConfig));
     }
 
@@ -198,6 +200,54 @@ public:
         }
     }
 
+    void setItemModified(int idx, const String& val, bool bEnable = true)
+    {
+        bool bFound = false;
+        if (varItemsModified.isArray())
+        {
+            for (int i = 0; i < varUserAddedItems.size(); ++i)
+            {
+                DynamicObject* dobj = varItemsModified[i].getDynamicObject();
+                if (int(dobj->getProperty("ItemIdx")) == idx)
+                {
+                    bFound = true;
+                    dobj->setProperty("Bytes", val);
+                    dobj->setProperty("AutoEnable", bEnable);
+                    break;
+                }
+            }
+        }
+        if (!bFound)
+        {
+            var varItem = JSON::parse("{}");
+            varItem.getDynamicObject()->setProperty("ItemIdx", idx);
+            varItem.getDynamicObject()->setProperty("Bytes", val);
+            varItem.getDynamicObject()->setProperty("AutoEnable", bEnable);
+            varItemsModified.append(varItem);
+        }
+    }
+
+    void setItemModifiedAutoEnable(int itemIdx, bool bEnable = true)
+    {
+        if (varItemsModified.isArray())
+        {
+            for (int i = 0; i < varItemsModified.size(); ++i)
+            {
+                DynamicObject* dobj = varItemsModified[i].getDynamicObject();
+                if (int(dobj->getProperty("ItemIdx")) == itemIdx)
+                {
+                    dobj->setProperty("AutoEnable", bEnable);
+                    break;
+                }
+            }
+        }
+    }
+
+    var getItemModified()
+    {
+        return varItemsModified;
+    }
+
 private:
     String getConfigStr(const String& cfgId)
     {
@@ -223,6 +273,7 @@ private:
     File     fappcofig;
     var      varAppConfig;
     var      varUserAddedItems;
+    var      varItemsModified;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(cczAssistAppConfig);
 };
 
