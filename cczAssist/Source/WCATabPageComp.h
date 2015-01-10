@@ -604,6 +604,7 @@ public:
             LOG(String("Wrong selected Row id: ") + String(rowSelected));
             return;
         }
+        tmpItemDetail.setItemDetail(lstModel.getItemDetail(rowSelected));
 
         setUISpcialEffect();
     }
@@ -648,7 +649,6 @@ private:
 
     void setUISpcialEffect()
     {
-        tmpItemDetail.setItemDetail(lstModel.getItemDetail(rowSelected));
         lbl_WCANam_Val.setText(InputStringConverter::ConvertGBKToUtf8Str(
             tmpItemDetail.getItemName(), 17), dontSendNotification);
         lbl_PicNum_Val.setText(String(tmpItemDetail.getItemIcon()), dontSendNotification);
@@ -726,7 +726,14 @@ private:
 
     void OnSavePanelRefresh()
     {
-
+        ItemDetail idtl;
+        if (cczAssistLibLoader::getInstance()->GetCczSingleItem(
+            lstWCA.getSelectedRow(), idtl))
+        {
+            tmpItemDetail.setItemDetail(idtl);
+            lstModel.setModify(lstWCA.getSelectedRow(), tmpItemDetail);
+            setUISpcialEffect();
+        }
     }
 
 private:

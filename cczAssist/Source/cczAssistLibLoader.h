@@ -141,6 +141,24 @@ public:
         return allItems;
     }
 
+    bool GetCczSingleItem(int idx, ItemDetail& rltDetail)
+    {
+        if (idx >= kItemsNum)
+        {
+            LOG("Index Out of range!");
+            return false;
+        }
+
+        unsigned long itemOffset = kItemsOffset + idx * sizeof(ItemDetail);
+        std::vector<byte> itemMem = GetCczMemory(itemOffset, sizeof(ItemDetail));
+        if (itemMem.empty() || itemMem[0] == 0)
+        {
+            return false;
+        }
+        rltDetail = *((PItemDetail)&itemMem[0]);
+        return true;
+    }
+
     void WriteItemToCcz(int idx, const ItemDetail& itDtl)
     {
         if (idx < 0 || idx >= kItemsNum)
