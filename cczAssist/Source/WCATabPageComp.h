@@ -61,6 +61,11 @@ public:
         return itemsModified.at(rowNum).getItemDetailPure();
     }
 
+    ItemDetail getItemOriginDetail(int rowNum)
+    {
+        return items.at(rowNum);
+    }
+
     void setModify(int rowNum, const ClsItemDetail& idtl )
     {
         if (rowNum >= items.size() || rowNum < 0)
@@ -599,13 +604,6 @@ public:
             LOG(String("Wrong selected Row id: ") + String(rowSelected));
             return;
         }
-        tmpItemDetail.setItemDetail(lstModel.getItemDetail(rowSelected));
-        lbl_WCANam_Val.setText(InputStringConverter::ConvertGBKToUtf8Str(
-            tmpItemDetail.getItemName(), 17), dontSendNotification);
-        lbl_PicNum_Val.setText(String(tmpItemDetail.getItemIcon()), dontSendNotification);
-        lbl_Price__Val.setText(tmpItemDetail.getItemPrice() == 255 ? 
-            UILC::Get_UI_Text("cczWCA_Text_NoPrice")
-            : String(tmpItemDetail.getItemPrice()), dontSendNotification);
 
         setUISpcialEffect();
     }
@@ -650,6 +648,14 @@ private:
 
     void setUISpcialEffect()
     {
+        tmpItemDetail.setItemDetail(lstModel.getItemDetail(rowSelected));
+        lbl_WCANam_Val.setText(InputStringConverter::ConvertGBKToUtf8Str(
+            tmpItemDetail.getItemName(), 17), dontSendNotification);
+        lbl_PicNum_Val.setText(String(tmpItemDetail.getItemIcon()), dontSendNotification);
+        lbl_Price__Val.setText(tmpItemDetail.getItemPrice() == 255 ? 
+            UILC::Get_UI_Text("cczWCA_Text_NoPrice")
+            : String(tmpItemDetail.getItemPrice()), dontSendNotification);
+
         if (tmpItemDetail.isNormalItem())
         {
             if (lastSelectedRadioBtn != &radioItypeNormal)
@@ -712,7 +718,10 @@ private:
 
     void OnSavePanelRestore()
     {
-
+        tmpItemDetail.setItemDetail(lstModel.getItemOriginDetail(lstWCA.getSelectedRow()));
+        setUISpcialEffect();
+        cczAssistLibLoader::getInstance()->WriteItemToCcz(
+            lstWCA.getSelectedRow(), tmpItemDetail.getItemDetailPure());
     }
 
     void OnSavePanelRefresh()
