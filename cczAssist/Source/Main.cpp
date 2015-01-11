@@ -74,7 +74,7 @@ public:
                                                     DocumentWindow::allButtons)
         {
             setUsingNativeTitleBar (true);
-            setLookAndFeel(&lkfl);
+            LookAndFeel::setDefaultLookAndFeel(&lkfl);
             setContentOwned (new MainContentComponent(), true);
 
             centreWithSize (getWidth(), getHeight());
