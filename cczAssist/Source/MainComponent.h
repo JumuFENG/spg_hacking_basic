@@ -31,7 +31,7 @@ public:
         spTc = new TabbedComponent(TabbedButtonBar::TabsAtTop);
         spTc->addTab(UILC::Get_UI_Text("cczAssistMain_TabName_Main"), Colour(0xffeeddff), tabMain, false);
         spTc->addTab(UILC::Get_UI_Text("cczAssistMain_TabName_WCA"), Colour(0xffeeddff), tabWCA, false);
-        spTc->setCurrentTabIndex(1);
+//         spTc->setCurrentTabIndex(1);
         addAndMakeVisible(spTc);
         UILC::Set_Comp_Size(this, "UL_MainWindow_Rect");
     }
