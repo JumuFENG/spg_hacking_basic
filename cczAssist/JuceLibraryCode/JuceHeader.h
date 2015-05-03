@@ -13,6 +13,7 @@
 #ifndef __APPHEADERFILE_YTRECG__
 #define __APPHEADERFILE_YTRECG__
 
+#include <memory>
 #include "AppConfig.h"
 #include "modules/juce_audio_basics/juce_audio_basics.h"
 #include "modules/juce_audio_devices/juce_audio_devices.h"
@@ -38,8 +39,8 @@
 namespace ProjectInfo
 {
     const char* const  projectName    = "cczAssist";
-    const char* const  versionString  = "1.0.0";
-    const int          versionNumber  = 0x10000;
+    const char* const  versionString  = "1.0.1";
+    const int          versionNumber  = 0x10001;
 }
 #endif
 
